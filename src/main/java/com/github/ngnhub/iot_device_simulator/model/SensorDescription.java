@@ -12,8 +12,8 @@ import java.util.List;
 public record SensorDescription(String topic,
                                 @Pattern(regexp = "^(Double|String)$")
                                 String type,
-                                @Nullable Double max,
                                 @Nullable Double min,
+                                @Nullable Double max,
                                 @Nullable List<Object> possibleValues,
                                 @Nullable Integer qos,
                                 @NotNull @JsonProperty("intervalInMillis") Long interval) {

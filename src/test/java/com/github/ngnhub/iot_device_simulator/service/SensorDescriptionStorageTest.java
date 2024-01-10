@@ -1,38 +1,80 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
-import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
+import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.test.StepVerifier;
 
 import java.io.IOException;
 
+import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.gpio;
+import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.temperature;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ExtendWith(MockitoExtension.class)
 class SensorDescriptionStorageTest {
 
+    @Mock
+    private SensorDescriptionValidator validator;
+    private SensorDescriptionStorage sensorDescriptionStorage;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        sensorDescriptionStorage = new SensorDescriptionStorage("classpath:test_sensors.json", validator);
+    }
+
     @Test
-    void shouldReturnGpioDescription() throws IOException {
+    void shouldReturnGpioDescription() {
         // given
-        SensorDescriptionStorage sensorDescriptionStorage = new SensorDescriptionStorage("classpath:test_sensors.json");
-        SensorDescription expected = new SensorDescription("gpio", "double", 1.0, 0.0, null, 1000L);
+        var expected = gpio();
 
         // when
-        SensorDescription actual = sensorDescriptionStorage.getBy("gpio").block();
+        var actual = sensorDescriptionStorage.getBy("gpio").block();
 
         // then
         assertEquals(expected, actual);
     }
 
     @Test
-    void shouldThrowsWhenSensorDoesNotExist() throws IOException {
-        // given
-        SensorDescriptionStorage sensorDescriptionStorage = new SensorDescriptionStorage("classpath:test_sensors.json");
-
+    void shouldThrowsWhenSensorDoesNotExist() {
         // when
-        IllegalArgumentException exc =
-                assertThrows(IllegalArgumentException.class, () -> sensorDescriptionStorage.getBy("not existed").block());
+        var exc =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> sensorDescriptionStorage.getBy("not existed").block()
+                );
 
         // then
         assertEquals("Sensor is not found: not existed", exc.getMessage());
+    }
+
+    @Test
+    void shouldReturnAllFromJsonFile() {
+        // when
+        var actual = sensorDescriptionStorage.getAll();
+
+        // then
+        var gpio = gpio();
+        var temperature = temperature();
+        StepVerifier.create(actual)
+                .expectNext(temperature)
+                .expectNext(gpio)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnAllTopics() {
+        // when
+        var actual = sensorDescriptionStorage.getAllTopics();
+
+        // then
+        StepVerifier.create(actual)
+                .expectNext("temperature")
+                .expectNext("gpio")
+                .verifyComplete();
     }
 }

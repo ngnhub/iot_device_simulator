@@ -1,7 +1,7 @@
 [
   {
     "topic": "gpio",
-    "type": "String",
+    "type": "Double",
     "intervalInMillis": 1000,
     "possibleValues": [1.0, 0.0]
   },

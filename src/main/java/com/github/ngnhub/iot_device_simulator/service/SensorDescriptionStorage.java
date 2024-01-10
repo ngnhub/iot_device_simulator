@@ -37,8 +37,7 @@ public class SensorDescriptionStorage {
     }
 
     public Flux<String> getAllTopics() {
-        return Flux.fromIterable(descriptions.values())
-                .map(SensorDescription::topic);
+        return getAll().map(SensorDescription::topic);
     }
 
     /**
