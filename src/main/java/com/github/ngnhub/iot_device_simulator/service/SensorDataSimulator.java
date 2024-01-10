@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-import static com.github.ngnhub.iot_device_simulator.model.SensorValueTypes.DOUBLE;
-import static com.github.ngnhub.iot_device_simulator.model.SensorValueTypes.STRING;
+import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.DOUBLE;
+import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.STRING;
 
 @Slf4j
 @Service

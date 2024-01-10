@@ -5,26 +5,31 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.List;
+import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.STRING;
 
 @Component
 @RequiredArgsConstructor
 public class SensorDescriptionValidator {
 
-    private final ValidationFacade jakartaValidator;
+    private final JakartaValidatorWrapper jakartaValidator;
 
     public void validate(SensorDescription description) {
         jakartaValidator.validate(description);
-        List<Object> values = description.possibleValues();
-        if (!ObjectUtils.isEmpty(values)) {
-            validatePossibleValues(description);
+        validateStringHasPossibleValues(description);
+        validatePossibleValuesMatchType(description);
+    }
+
+    private void validateStringHasPossibleValues(SensorDescription description) {
+        if (STRING.equals(description.type()) && CollectionUtils.isEmpty(description.possibleValues())) {
+            throw new ConstraintViolationException(
+                    "Possible values can't be empty for the string type. Topic: " + description.topic(), null);
         }
     }
 
-    // TODO: 10.01.2024 if null min max can't be there
-    private void validatePossibleValues(SensorDescription description) {
+    private void validatePossibleValuesMatchType(SensorDescription description) {
         var values = description.possibleValues();
         if (ObjectUtils.isEmpty(values)) {
             return;
@@ -33,7 +38,7 @@ public class SensorDescriptionValidator {
             var possibleValueType = val.getClass().getSimpleName();
             if (!description.type().equals(possibleValueType)) {
                 throw new ConstraintViolationException(
-                        "Possible values invalid type; topic: " + description.topic(), null);
+                        "Possible values have invalid type. Topic: " + description.topic(), null);
             }
         });
     }

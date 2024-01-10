@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.model;
+package com.github.ngnhub.iot_device_simulator.utils;
 
 import lombok.experimental.UtilityClass;
 
