@@ -1,0 +1,91 @@
+package com.github.ngnhub.iot_device_simulator.service;
+
+import com.github.ngnhub.iot_device_simulator.event.SensorValueUpdatedEvent;
+import com.github.ngnhub.iot_device_simulator.model.SensorData;
+import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Random;
+
+import static com.github.ngnhub.iot_device_simulator.model.SensorValueTypes.DOUBLE;
+import static com.github.ngnhub.iot_device_simulator.model.SensorValueTypes.STRING;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class SensorDataSimulator {
+
+    private final SensorDescriptionStorage storage;
+    private final ApplicationEventPublisher publisher;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void init() {
+        startGenerateValues();
+    }
+
+    // TODO: 10.01.2024 test
+    public void startGenerateValues() {
+        storage.getAll()
+                .flatMap(description -> Flux
+                        .interval(Duration.ofMillis(description.interval()))
+                        .map(v -> getRandomValue(description)))
+                .subscribe(data -> publisher.publishEvent(new SensorValueUpdatedEvent(data)));
+    }
+
+    private SensorData<?> getRandomValue(SensorDescription description) {
+        switch (description.type()) {
+            case DOUBLE -> {
+                return getRandomPossibleOrBoundedValue(description);
+            }
+            case STRING -> {
+                return getRandomPossibleValue(description);
+            }
+            default -> throw new UnsupportedOperationException("Unexpected type: " + description.type());
+        }
+    }
+
+    private SensorData<?> getRandomPossibleOrBoundedValue(SensorDescription description) {
+        if (!CollectionUtils.isEmpty(description.possibleValues())) {
+            return getRandomPossibleValue(description);
+        }
+        double min = Double.MIN_VALUE;
+        double max = Double.MAX_VALUE;
+        if (description.min() != null) {
+            min = description.min();
+        }
+        if (description.max() != null) {
+            max = description.max();
+        }
+        double value = min + new Random().nextDouble() * (max - min);
+        return convertToSensorData(description, value);
+    }
+
+    private SensorData<?> getRandomPossibleValue(SensorDescription description) {
+        List<?> possibleStringValues = description.possibleValues();
+        if (CollectionUtils.isEmpty(possibleStringValues)) {
+            throw new IllegalArgumentException("There is no possible values for: " + description.topic());
+        }
+        int index = new Random().nextInt(possibleStringValues.size());
+        var value = possibleStringValues.get(index);
+        return convertToSensorData(description, value);
+    }
+
+    private <T> SensorData<T> convertToSensorData(SensorDescription description, T value) {
+        return SensorData.<T>builder().topic(description.topic())
+                .sensorData(value)
+                .time(LocalDateTime.now())
+                .qos(description.qos())
+                .build();
+    }
+}

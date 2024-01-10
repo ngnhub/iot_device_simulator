@@ -1,0 +1,6 @@
+spring:
+  rsocket:
+    server:
+      port: 7071
+
+sensor-descriptor-path: 'classpath:default_sensors.json'

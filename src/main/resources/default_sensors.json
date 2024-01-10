@@ -1,0 +1,66 @@
+[
+  {
+    "name": "gpio",
+    "type": "string",
+    "intervalInMillis": 1000,
+    "possibleStringValues": ["1", "0"]
+  },
+  {
+    "name": "temperature",
+    "type": "double",
+    "min": -50,
+    "max": 100,
+    "intervalInMillis": 1000
+  },
+  {
+    "name": "humidity",
+    "type": "double",
+    "min": 0,
+    "max": 100,
+    "intervalInMillis": 10000
+  },
+  {
+    "name": "pressure",
+    "type": "double",
+    "min": 900,
+    "max": 1100,
+    "intervalInMillis": 10000
+  },
+  {
+    "name": "luminosity",
+    "type": "double",
+    "min": 0,
+    "max": 100000,
+    "intervalInMillis": 10000
+  },
+  {
+    "name": "proximity",
+    "type": "double",
+    "min": 0,
+    "max": 200,
+    "intervalInMillis": 20000
+  },
+  {
+    "name": "device_status",
+    "type": "string",
+    "possibleStringValues": ["on", "off", "standby"],
+    "intervalInMillis": 3000
+  },
+  {
+    "name": "gyroscope",
+    "type": "double",
+    "intervalInMillis": 10000
+  },
+  {
+    "name": "magnetic_field",
+    "type": "double",
+    "intervalInMillis": 10000
+  },
+  {
+    "name": "voltage",
+    "type": "double",
+    "min": 0,
+    "max": 5,
+    "intervalInMillis": 100
+  }
+]

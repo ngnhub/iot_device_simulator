@@ -1,0 +1,12 @@
+spring:
+  rsocket:
+    server:
+      port: 7070
+
+#todo all props from variable
+sensor-descriptor-path: 'classpath:default_sensors.json'
+mqtt:
+  host: 'localhost'
+  port: 1883
+  username: 'admin'
+  password: 'admin'
