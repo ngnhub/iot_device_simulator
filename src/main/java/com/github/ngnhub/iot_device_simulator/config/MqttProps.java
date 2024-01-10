@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "mqtt")
 public class MqttProps {
 
+    private boolean enabled;
     private String host;
     private int port;
     private String username;

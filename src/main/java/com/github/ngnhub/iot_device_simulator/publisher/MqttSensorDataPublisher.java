@@ -14,6 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "mqtt.enabled", matchIfMissing = true)
 public class MqttSensorDataPublisher {
 
     private static final int DEFAULT_QOS = 2;
@@ -33,8 +35,13 @@ public class MqttSensorDataPublisher {
     private final MqttProps props;
 
     @PreDestroy
-    public void tearDown() throws MqttException {
-        mqttClient.disconnect();
+    public void tearDown() {
+        try {
+            mqttClient.disconnect();
+            log.info("Mqtt client has been disconnected");
+        } catch (MqttException e) {
+            log.error("Mqtt client disconnection error", e);
+        }
     }
 
     public void startPublishing() {
@@ -65,7 +72,7 @@ public class MqttSensorDataPublisher {
     }
 
     private String generateTopic(String sensor) {
-        var messageId = UUID.randomUUID();
+        var messageId = UUID.randomUUID(); // TODO: 10.01.2024 switcher, it may be unnecassery
         var topicBasePath = props.getTopicBasePath();
         if (topicBasePath == null) {
             return String.format("%s/%s", messageId, sensor);
