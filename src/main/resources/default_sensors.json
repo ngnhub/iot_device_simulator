@@ -1,64 +1,64 @@
 [
   {
-    "name": "gpio",
-    "type": "string",
+    "topic": "gpio",
+    "type": "String",
     "intervalInMillis": 1000,
-    "possibleStringValues": ["1", "0"]
+    "possibleValues": [1.0, 0.0]
   },
   {
-    "name": "temperature",
-    "type": "double",
+    "topic": "temperature",
+    "type": "Double",
     "min": -50,
     "max": 100,
     "intervalInMillis": 1000
   },
   {
-    "name": "humidity",
-    "type": "double",
+    "topic": "humidity",
+    "type": "Double",
     "min": 0,
     "max": 100,
     "intervalInMillis": 10000
   },
   {
-    "name": "pressure",
-    "type": "double",
+    "topic": "pressure",
+    "type": "Double",
     "min": 900,
     "max": 1100,
     "intervalInMillis": 10000
   },
   {
-    "name": "luminosity",
-    "type": "double",
+    "topic": "luminosity",
+    "type": "Double",
     "min": 0,
     "max": 100000,
     "intervalInMillis": 10000
   },
   {
-    "name": "proximity",
-    "type": "double",
+    "topic": "proximity",
+    "type": "Double",
     "min": 0,
     "max": 200,
     "intervalInMillis": 20000
   },
   {
-    "name": "device_status",
-    "type": "string",
-    "possibleStringValues": ["on", "off", "standby"],
+    "topic": "device_status",
+    "type": "String",
+    "possibleValues": ["on", "off", "standby"],
     "intervalInMillis": 3000
   },
   {
-    "name": "gyroscope",
-    "type": "double",
+    "topic": "gyroscope",
+    "type": "Double",
     "intervalInMillis": 10000
   },
   {
-    "name": "magnetic_field",
-    "type": "double",
+    "topic": "magnetic_field",
+    "type": "Double",
     "intervalInMillis": 10000
   },
   {
-    "name": "voltage",
-    "type": "double",
+    "topic": "voltage",
+    "type": "Double",
     "min": 0,
     "max": 5,
     "intervalInMillis": 100

@@ -3,7 +3,7 @@ package com.github.ngnhub.iot_device_simulator.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
-import com.github.ngnhub.iot_device_simulator.utils.ValidationFacade;
+import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -23,7 +23,7 @@ public class SensorDescriptionStorage {
     private final Map<String, SensorDescription> descriptions;
 
     public SensorDescriptionStorage(@Value("${sensor-descriptor-path}") String descriptorPath,
-                                    ValidationFacade validator) throws IOException {
+                                    SensorDescriptionValidator validator) throws IOException {
         var file = ResourceUtils.getFile(descriptorPath);
         var mapper = new ObjectMapper();
         List<SensorDescription> descriptionList = mapper.readValue(file, new TypeReference<>() {});
