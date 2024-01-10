@@ -23,6 +23,7 @@ public class SensorDescriptionValidator {
         }
     }
 
+    // TODO: 10.01.2024 if null min max can't be there
     private void validatePossibleValues(SensorDescription description) {
         var values = description.possibleValues();
         if (ObjectUtils.isEmpty(values)) {

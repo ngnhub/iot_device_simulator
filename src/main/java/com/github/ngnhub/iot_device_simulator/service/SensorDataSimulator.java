@@ -34,13 +34,21 @@ public class SensorDataSimulator {
         startGenerateValues();
     }
 
-    // TODO: 10.01.2024 test
     public void startGenerateValues() {
         storage.getAll()
                 .flatMap(description -> Flux
                         .interval(Duration.ofMillis(description.interval()))
-                        .map(v -> getRandomValue(description)))
+                        .map(v -> tryGetRandomValue(description))
+                )
                 .subscribe(data -> publisher.publishEvent(new SensorValueUpdatedEvent(data)));
+    }
+
+    private SensorData<?> tryGetRandomValue(SensorDescription description) {
+        try {
+            return getRandomValue(description);
+        } catch (Exception e) {
+            return getErrorData(description, e);
+        }
     }
 
     private SensorData<?> getRandomValue(SensorDescription description) {
@@ -51,7 +59,7 @@ public class SensorDataSimulator {
             case STRING -> {
                 return getRandomPossibleValue(description);
             }
-            default -> throw new UnsupportedOperationException("Unexpected type: " + description.type());
+            default -> throw new UnsupportedOperationException("Unsupported type: " + description.type());
         }
     }
 
@@ -84,6 +92,14 @@ public class SensorDataSimulator {
     private <T> SensorData<T> convertToSensorData(SensorDescription description, T value) {
         return SensorData.<T>builder().topic(description.topic())
                 .sensorData(value)
+                .time(LocalDateTime.now())
+                .qos(description.qos())
+                .build();
+    }
+
+    private SensorData<String> getErrorData(SensorDescription description, Exception exc) {
+        return SensorData.<String>builder().topic(description.topic())
+                .sensorData("Error {" + exc.getMessage() + "}")
                 .time(LocalDateTime.now())
                 .qos(description.qos())
                 .build();

@@ -1,9 +1,9 @@
 [
   {
     "topic": "gpio",
-    "type": "Double",
-    "intervalInMillis": 1000,
-    "possibleValues": [1.0, 0.0]
+    "type": "String",
+    "intervalInMillis": 900,
+    "possibleValues": ["1", "0"]
   },
   {
     "topic": "temperature",
