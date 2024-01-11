@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SensorDataSubscribeService {
 
     private final ConcurrentHashMap<String,
-            Map<String, Sinks.Many<SensorData<?>>>> TOPICS_TO_MESSAGE_QUEUES = new ConcurrentHashMap<>();
+            Map<String, Sinks.Many<SensorData>>> TOPICS_TO_MESSAGE_QUEUES = new ConcurrentHashMap<>();
 
     @EventListener
     public void onEvent(SensorValueUpdatedEvent event) {
@@ -30,8 +30,8 @@ public class SensorDataSubscribeService {
         TOPICS_TO_MESSAGE_QUEUES.compute(topic, (key, queues) -> fanOut(data, queues));
     }
 
-    private Map<String, Sinks.Many<SensorData<?>>> fanOut(SensorData<?> data,
-                                                          Map<String, Sinks.Many<SensorData<?>>> queues) {
+    private Map<String, Sinks.Many<SensorData>> fanOut(SensorData data,
+                                                       Map<String, Sinks.Many<SensorData>> queues) {
         if (queues == null) {
             queues = new HashMap<>(100);
         } else {
@@ -46,8 +46,8 @@ public class SensorDataSubscribeService {
         return new SinkKey(id, sink);
     }
 
-    private Sinks.Many<SensorData<?>> addNewQueue(String topic, String id) {
-        Sinks.Many<SensorData<?>> sink = Sinks.many().unicast().onBackpressureBuffer();
+    private Sinks.Many<SensorData> addNewQueue(String topic, String id) {
+        Sinks.Many<SensorData> sink = Sinks.many().unicast().onBackpressureBuffer();
         TOPICS_TO_MESSAGE_QUEUES.compute(topic, (key, queues) -> {
             if (queues == null) {
                 queues = new HashMap<>();
@@ -65,5 +65,5 @@ public class SensorDataSubscribeService {
         });
     }
 
-    public record SinkKey(String id, Sinks.Many<SensorData<?>> sink) {}
+    public record SinkKey(String id, Sinks.Many<SensorData> sink) {}
 }

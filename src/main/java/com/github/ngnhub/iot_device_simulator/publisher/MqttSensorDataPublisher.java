@@ -51,7 +51,7 @@ public class MqttSensorDataPublisher {
                 .subscribe();
     }
 
-    private Mono<Object> publish(SensorData<?> data) {
+    private Mono<Object> publish(SensorData data) {
         return Mono.fromCallable(() -> {
             var topic = generateTopic(data.getTopic());
             var mqttMessage = new MqttMessage();

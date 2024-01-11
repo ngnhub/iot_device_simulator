@@ -43,7 +43,7 @@ public class SensorDataSimulator {
                 .subscribe(data -> publisher.publishEvent(new SensorValueUpdatedEvent(data)));
     }
 
-    private SensorData<?> tryGetRandomValue(SensorDescription description) {
+    private SensorData tryGetRandomValue(SensorDescription description) {
         try {
             return getRandomValue(description);
         } catch (Exception e) {
@@ -51,7 +51,7 @@ public class SensorDataSimulator {
         }
     }
 
-    private SensorData<?> getRandomValue(SensorDescription description) {
+    private SensorData getRandomValue(SensorDescription description) {
         switch (description.type()) {
             case DOUBLE -> {
                 return getRandomPossibleOrBoundedValue(description);
@@ -63,7 +63,7 @@ public class SensorDataSimulator {
         }
     }
 
-    private SensorData<?> getRandomPossibleOrBoundedValue(SensorDescription description) {
+    private SensorData getRandomPossibleOrBoundedValue(SensorDescription description) {
         if (!CollectionUtils.isEmpty(description.possibleValues())) {
             return getRandomPossibleValue(description);
         }
@@ -79,7 +79,7 @@ public class SensorDataSimulator {
         return convertToSensorData(description, value);
     }
 
-    private SensorData<?> getRandomPossibleValue(SensorDescription description) {
+    private SensorData getRandomPossibleValue(SensorDescription description) {
         List<?> possibleStringValues = description.possibleValues();
         if (CollectionUtils.isEmpty(possibleStringValues)) {
             throw new IllegalArgumentException("There is no possible values for: " + description.topic());
@@ -89,16 +89,16 @@ public class SensorDataSimulator {
         return convertToSensorData(description, value);
     }
 
-    private <T> SensorData<T> convertToSensorData(SensorDescription description, T value) {
-        return SensorData.<T>builder().topic(description.topic())
-                .sensorData(value)
+    private SensorData convertToSensorData(SensorDescription description, Object value) {
+        return SensorData.builder().topic(description.topic())
+                .sensorData(value.toString())
                 .time(LocalDateTime.now())
                 .qos(description.qos())
                 .build();
     }
 
-    private SensorData<String> getErrorData(SensorDescription description, Exception exc) {
-        return SensorData.<String>builder().topic(description.topic())
+    private SensorData getErrorData(SensorDescription description, Exception exc) {
+        return SensorData.builder().topic(description.topic())
                 .sensorData("Error {" + exc.getMessage() + "}")
                 .time(LocalDateTime.now())
                 .qos(description.qos())

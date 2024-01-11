@@ -30,7 +30,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @ExtendWith(MockitoExtension.class)
 class SensorDataSimulatorTest {
 
@@ -67,16 +66,14 @@ class SensorDataSimulatorTest {
         List<SensorValueUpdatedEvent> allValues = eventArgumentCaptor.getAllValues();
         assertEquals(2, allValues.size());
 
-        SensorData<?> gpioCaptured = allValues.get(0).data();
+        SensorData gpioCaptured = allValues.get(0).data();
         assertEquals(gpio.topic(), gpioCaptured.getTopic());
-        assertTrue(gpioCaptured.getSensorData() instanceof String);
         assertFalse(CollectionUtils.isEmpty(gpio.possibleValues()));
         assertTrue(gpio.possibleValues().contains(gpioCaptured.getSensorData()));
 
-        SensorData<?> temperatureCaptured = allValues.get(1).data();
+        SensorData temperatureCaptured = allValues.get(1).data();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
-        assertTrue(temperatureCaptured.getSensorData() instanceof Double);
-        Double sensorData = (Double) temperatureCaptured.getSensorData();
+        double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
         assertNotNull(temperature.min());
         assertNotNull(temperature.max());
         boolean inRange = temperature.min() <= sensorData && sensorData <= temperature.max();
@@ -100,10 +97,9 @@ class SensorDataSimulatorTest {
 
         // then
         verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData<?> temperatureCaptured = eventArgumentCaptor.getValue().data();
+        SensorData temperatureCaptured = eventArgumentCaptor.getValue().data();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
-        assertTrue(temperatureCaptured.getSensorData() instanceof Double);
-        Double sensorData = (Double) temperatureCaptured.getSensorData();
+        double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
         assertNull(temperature.min());
         assertNotNull(temperature.max());
         boolean inRange = Double.MIN_VALUE <= sensorData && sensorData <= temperature.max();
@@ -127,10 +123,9 @@ class SensorDataSimulatorTest {
 
         // then
         verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData<?> temperatureCaptured = eventArgumentCaptor.getValue().data();
+        SensorData temperatureCaptured = eventArgumentCaptor.getValue().data();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
-        assertTrue(temperatureCaptured.getSensorData() instanceof Double);
-        Double sensorData = (Double) temperatureCaptured.getSensorData();
+        double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
         assertNotNull(temperature.min());
         assertNull(temperature.max());
         boolean inRange = temperature.min() <= sensorData && sensorData <= Double.MAX_VALUE;
@@ -155,10 +150,9 @@ class SensorDataSimulatorTest {
 
         // then
         verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData<?> temperatureCaptured = eventArgumentCaptor.getValue().data();
+        SensorData temperatureCaptured = eventArgumentCaptor.getValue().data();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
-        assertTrue(temperatureCaptured.getSensorData() instanceof Double);
-        double sensorData = (double) temperatureCaptured.getSensorData();
+        double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
         assertNull(temperature.min());
         assertNull(temperature.max());
         boolean inRange = Double.MIN_VALUE <= sensorData && sensorData <= Double.MAX_VALUE;
@@ -183,9 +177,8 @@ class SensorDataSimulatorTest {
 
         // then
         verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData<?> gpioCaptured = eventArgumentCaptor.getValue().data();
+        SensorData gpioCaptured = eventArgumentCaptor.getValue().data();
         assertEquals(gpio.topic(), gpioCaptured.getTopic());
-        assertTrue(gpioCaptured.getSensorData() instanceof String);
         assertTrue(CollectionUtils.isEmpty(gpio.possibleValues()));
         assertEquals(
                 "Error {There is no possible values for: " + gpio.topic() + "}",
@@ -211,7 +204,7 @@ class SensorDataSimulatorTest {
 
         // then
         verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData<?> gpioCaptured = eventArgumentCaptor.getValue().data();
+        SensorData gpioCaptured = eventArgumentCaptor.getValue().data();
         assertEquals(gpio.topic(), gpioCaptured.getTopic());
         assertEquals(
                 "Error {Unsupported type: " + gpio.type() + "}",

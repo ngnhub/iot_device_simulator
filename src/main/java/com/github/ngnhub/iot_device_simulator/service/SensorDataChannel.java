@@ -15,7 +15,7 @@ public class SensorDataChannel {
 
     private final SensorDataSubscribeService buffer;
 
-    public Flux<SensorData<?>> subscribe(String topic) {
+    public Flux<SensorData> subscribe(String topic) {
         return Mono.fromCallable(() -> buffer.subscribe(topic))
                 .flatMapMany(sinkKey -> sinkKey.sink().asFlux()
                         .doFinally(s -> buffer.unsubscribe(topic, sinkKey.id())));
