@@ -1,8 +1,8 @@
 package com.github.ngnhub.iot_device_simulator.publisher;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -16,6 +16,10 @@ import org.springframework.http.codec.cbor.Jackson2CborDecoder;
 import org.springframework.http.codec.cbor.Jackson2CborEncoder;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.messaging.rsocket.RSocketStrategies;
+import org.springframework.util.CollectionUtils;
+
+import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.gpio;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 @Import(RSocketSensorDataPublisherTest.Config.class)
@@ -38,15 +42,11 @@ class RSocketSensorDataPublisherTest {
     @Autowired
     private RSocketRequester requester;
 
-    @AfterEach
-    void tearDown() {
-        requester.dispose();
-    }
-
     @Test
-    void stream() {
+    @Timeout(5)
+    void testStream() {
         // when
-        Flux<SensorData> gpio = requester.route("subscribe/{sensorName}", "gpio")
+        Flux<SensorData> gpio = requester.route("subscribe/{topic}", "gpio")
                 .retrieveFlux(SensorData.class)
                 .take(3L);
 
@@ -58,9 +58,29 @@ class RSocketSensorDataPublisherTest {
                 .verifyComplete();
     }
 
-    private boolean isGpioAndInRange(SensorData<Double> val) {
+    private boolean isGpioAndInRange(SensorData val) {
+        var gpio = gpio();
+        var possibleValues = gpio.possibleValues();
+        assertFalse(CollectionUtils.isEmpty(possibleValues));
         return val.getTopic().equals("gpio")
-                && 0.0 <= val.getSensorData()
-                && val.getSensorData() <= 1.0;
+                && possibleValues.contains(val.getSensorData());
+    }
+
+    @Test
+    @Timeout(5)
+    void testStreamValues() {
+        // when
+        Flux<String> gpio = requester.route("subscribe/value/{topic}", "gpio")
+                .retrieveFlux(String.class)
+                .take(3L);
+
+        // then
+        var possibleValues = gpio().possibleValues();
+        assertFalse(CollectionUtils.isEmpty(possibleValues));
+        StepVerifier.create(gpio)
+                .expectNextMatches(possibleValues::contains)
+                .expectNextMatches(possibleValues::contains)
+                .expectNextMatches(possibleValues::contains)
+                .verifyComplete();
     }
 }

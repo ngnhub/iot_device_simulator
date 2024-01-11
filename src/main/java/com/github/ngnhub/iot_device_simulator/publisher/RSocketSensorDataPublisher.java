@@ -15,9 +15,14 @@ public class RSocketSensorDataPublisher {
 
     private final SensorDataChannel publisher;
 
-    // TODO: 10.01.2024 endpoint to consume only values
     @MessageMapping("subscribe/{topic}")
     public Flux<SensorData<?>> stream(@DestinationVariable String topic) {
         return publisher.subscribe(topic);
+    }
+
+    @MessageMapping("subscribe/value/{topic}")
+    public Flux<String> streamValues(@DestinationVariable String topic) {
+        return publisher.subscribe(topic)
+                .map(data -> data.getSensorData().toString());
     }
 }

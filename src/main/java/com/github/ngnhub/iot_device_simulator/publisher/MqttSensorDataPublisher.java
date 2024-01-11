@@ -14,7 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "mqtt.enabled", matchIfMissing = true)
+@ConditionalOnBean(MqttClient.class)
 public class MqttSensorDataPublisher {
 
     private static final int DEFAULT_QOS = 2;
