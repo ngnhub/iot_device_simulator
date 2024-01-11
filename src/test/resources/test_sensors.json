@@ -2,7 +2,7 @@
   {
     "topic": "gpio",
     "type": "String",
-    "intervalInMillis": 900,
+    "intervalInMillis": 90,
     "possibleValues": ["1", "0"]
   },
   {
@@ -11,6 +11,6 @@
     "min": -50,
     "max": 100,
     "qos": 1,
-    "intervalInMillis": 1000
+    "intervalInMillis": 100
   }
 ]
