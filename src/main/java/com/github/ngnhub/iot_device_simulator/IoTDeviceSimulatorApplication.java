@@ -4,6 +4,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
+// TODO: 11.01.2024 docker image
 @SpringBootApplication
 public class IoTDeviceSimulatorApplication {
 

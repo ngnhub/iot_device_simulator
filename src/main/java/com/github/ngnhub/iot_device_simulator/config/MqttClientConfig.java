@@ -24,7 +24,7 @@ public class MqttClientConfig {
         var mqttClient = new MqttClient(url, publisherId, new MqttDefaultFilePersistence("/tmp"));
         var options = new MqttConnectOptions();
         options.setUserName(props.getUsername());
-        String password = props.getPassword();
+        var password = props.getPassword();
         if (password != null) {
             options.setPassword(password.toCharArray());
         }
