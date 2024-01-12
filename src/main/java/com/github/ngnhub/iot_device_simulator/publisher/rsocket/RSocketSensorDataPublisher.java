@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.publisher;
+package com.github.ngnhub.iot_device_simulator.publisher.rsocket;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataChannel;

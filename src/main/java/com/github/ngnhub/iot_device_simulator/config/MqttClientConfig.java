@@ -14,14 +14,22 @@ import java.util.UUID;
 
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "mqtt.enabled", matchIfMissing = true)
 public class MqttClientConfig {
 
+    public static String MQTT_LOG_TAG = "[MQTT]";
+
     @Bean
-    @ConditionalOnProperty(name = "mqtt.enabled", matchIfMissing = true)
-    public MqttClient mqttClient(MqttProps props) throws MqttException {
+    public MqttClient mqttClient(MqttProps props, MqttConnectOptions options) throws MqttException {
         var publisherId = UUID.randomUUID().toString();
         var url = "tcp://" + props.getHost() + ":" + props.getPort();
-        var mqttClient = new MqttClient(url, publisherId, new MqttDefaultFilePersistence("/tmp"));
+        MqttClient mqttClient = new MqttClient(url, publisherId, new MqttDefaultFilePersistence("/tmp"));
+        mqttClient.connect(options);
+        return mqttClient;
+    }
+
+    @Bean
+    public MqttConnectOptions mqttOptions(MqttProps props) {
         var options = new MqttConnectOptions();
         options.setUserName(props.getUsername());
         var password = props.getPassword();
@@ -29,7 +37,6 @@ public class MqttClientConfig {
             options.setPassword(password.toCharArray());
         }
         options.setAutomaticReconnect(true);
-        mqttClient.connect(options);
-        return mqttClient;
+        return options;
     }
 }
