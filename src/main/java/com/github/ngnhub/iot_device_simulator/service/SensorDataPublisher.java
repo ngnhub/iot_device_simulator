@@ -1,11 +1,9 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
-import com.github.ngnhub.iot_device_simulator.event.SensorValueUpdatedEvent;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Sinks;
 
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -23,9 +21,7 @@ public class SensorDataPublisher {
     private final ConcurrentHashMap<String,
             Map<String, Sinks.Many<SensorData>>> TOPICS_TO_MESSAGE_QUEUES = new ConcurrentHashMap<>();
 
-    @EventListener
-    public void onEvent(SensorValueUpdatedEvent event) {
-        var data = event.data();
+    public void publish(SensorData data) {
         var topic = data.getTopic();
         TOPICS_TO_MESSAGE_QUEUES.compute(topic, (key, queues) -> fanOut(data, queues));
     }

@@ -1,6 +1,5 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
-import com.github.ngnhub.iot_device_simulator.event.SensorValueUpdatedEvent;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -27,7 +25,7 @@ import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.STRI
 public class SensorDataSimulator {
 
     private final SensorDescriptionStorage storage;
-    private final ApplicationEventPublisher publisher;
+    private final SensorDataPublisher publisher;
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
@@ -40,7 +38,7 @@ public class SensorDataSimulator {
                         .interval(Duration.ofMillis(description.interval()))
                         .map(v -> tryGetRandomValue(description))
                 )
-                .subscribe(data -> publisher.publishEvent(new SensorValueUpdatedEvent(data)));
+                .subscribe(publisher::publish);
     }
 
     private SensorData tryGetRandomValue(SensorDescription description) {

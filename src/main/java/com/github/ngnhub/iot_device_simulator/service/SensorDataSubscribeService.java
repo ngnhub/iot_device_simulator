@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SensorDataSubscribeService {
 
-    private final SensorDataPublisher buffer;
+    private final SensorDataPublisher publisher;
 
     public Flux<SensorData> subscribe(String topic) {
-        return Mono.fromCallable(() -> buffer.subscribe(topic))
+        return Mono.fromCallable(() -> publisher.subscribe(topic))
                 .flatMapMany(sinkKey -> sinkKey.sink().asFlux()
-                        .doFinally(s -> buffer.unsubscribe(topic, sinkKey.id())));
+                        .doFinally(s -> publisher.unsubscribe(topic, sinkKey.id())));
     }
 }
