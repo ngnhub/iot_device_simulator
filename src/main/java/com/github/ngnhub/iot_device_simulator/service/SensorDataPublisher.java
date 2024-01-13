@@ -61,5 +61,5 @@ public class SensorDataPublisher {
         });
     }
 
-    public record SinkKey(String id, Sinks.Many<SensorData> sink) {}
+    public record SinkKey(String subscriberId, Sinks.Many<SensorData> sink) {}
 }

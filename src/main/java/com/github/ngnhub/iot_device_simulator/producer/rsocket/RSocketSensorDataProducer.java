@@ -17,12 +17,12 @@ public class RSocketSensorDataProducer {
 
     @MessageMapping("subscribe/{topic}")
     public Flux<SensorData> stream(@DestinationVariable String topic) {
-        return publisher.subscribe(topic);
+        return publisher.subscribeOn(topic);
     }
 
     @MessageMapping("subscribe/value/{topic}")
     public Flux<String> streamValues(@DestinationVariable String topic) {
-        return publisher.subscribe(topic)
+        return publisher.subscribeOn(topic)
                 .map(SensorData::getSensorData);
     }
 }

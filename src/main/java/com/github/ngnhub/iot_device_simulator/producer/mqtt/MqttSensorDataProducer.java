@@ -46,7 +46,7 @@ public class MqttSensorDataProducer {
 
     public Flux<Object> subscribeAndProduce() {
         return storage.getAllTopics()
-                .flatMap(sensorDataSubscribeService::subscribe)
+                .flatMap(sensorDataSubscribeService::subscribeOn)
                 .flatMap(this::publish);
     }
 
