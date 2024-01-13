@@ -1,7 +1,7 @@
-package com.github.ngnhub.iot_device_simulator.publisher;
+package com.github.ngnhub.iot_device_simulator.producer.rsocket;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.SensorDataChannel;
+import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
-public class RSocketSensorDataPublisher {
+public class RSocketSensorDataProducer {
 
-    private final SensorDataChannel publisher;
+    private final SensorDataSubscribeService publisher;
 
     @MessageMapping("subscribe/{topic}")
     public Flux<SensorData> stream(@DestinationVariable String topic) {
