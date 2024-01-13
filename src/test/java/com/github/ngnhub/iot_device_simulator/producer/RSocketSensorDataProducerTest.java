@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.publisher;
+package com.github.ngnhub.iot_device_simulator.producer;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import org.junit.jupiter.api.Test;
@@ -22,8 +22,8 @@ import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescripti
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
-@Import(RSocketSensorDataPublisherTest.Config.class)
-class RSocketSensorDataPublisherTest {
+@Import(RSocketSensorDataProducerTest.Config.class)
+class RSocketSensorDataProducerTest {
 
     @TestConfiguration
     public static class Config {

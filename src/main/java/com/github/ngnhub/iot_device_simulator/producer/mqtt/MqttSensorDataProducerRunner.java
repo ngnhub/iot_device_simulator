@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.publisher.mqtt;
+package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,17 +17,17 @@ import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQT
 import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST;
 
 @Slf4j
-@ConditionalOnBean(MqttSensorDataPublisher.class)
+@ConditionalOnBean(MqttSensorDataProducer.class)
 @Component
 @RequiredArgsConstructor
-public class MqttSensorDataPublisherRunner {
+public class MqttSensorDataProducerRunner {
 
-    private final MqttSensorDataPublisher publisher;
+    private final MqttSensorDataProducer publisher;
     private final MqttConnectOptions options;
 
     @EventListener(ApplicationContextEvent.class)
     public void runMqtt() {
-        publisher.subscribeAndPublish()
+        publisher.subscribeAndProduce()
                 .doOnError(this::handleError)
                 .onErrorComplete()
                 .subscribe();

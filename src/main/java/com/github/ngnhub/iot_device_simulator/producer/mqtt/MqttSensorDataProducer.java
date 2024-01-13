@@ -1,8 +1,8 @@
-package com.github.ngnhub.iot_device_simulator.publisher.mqtt;
+package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.config.MqttProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.SensorDataChannel;
+import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
 import com.github.ngnhub.iot_device_simulator.service.SensorDescriptionStorage;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +25,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnBean(MqttClient.class)
-public class MqttSensorDataPublisher {
+public class MqttSensorDataProducer {
 
     private static final int DEFAULT_QOS = 2;
 
-    private final SensorDataChannel sensorDataChannel;
+    private final SensorDataSubscribeService sensorDataSubscribeService;
     private final SensorDescriptionStorage storage;
     private final MqttClient mqttClient;
     private final MqttProps props;
@@ -44,9 +44,9 @@ public class MqttSensorDataPublisher {
         }
     }
 
-    public Flux<Object> subscribeAndPublish() {
+    public Flux<Object> subscribeAndProduce() {
         return storage.getAllTopics()
-                .flatMap(sensorDataChannel::subscribe)
+                .flatMap(sensorDataSubscribeService::subscribe)
                 .flatMap(this::publish);
     }
 
