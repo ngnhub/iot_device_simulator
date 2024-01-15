@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQTT_LOG_TAG;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -36,13 +38,13 @@ public class MqttSensorDataProducer {
     public void tearDown() {
         try {
             mqttClient.disconnect();
-            log.info("Mqtt client has been disconnected");
+            log.info("{} Mqtt client has been disconnected", MQTT_LOG_TAG);
         } catch (MqttException e) {
-            log.error("Mqtt client disconnection error", e);
+            log.error("{} Mqtt client disconnection error", MQTT_LOG_TAG, e);
         }
     }
 
-    public Flux<Object> subscribeAndProduce() {
+    public Flux<Void> subscribeAndProduce() {
         return storage.getAllTopics()
                 .flatMap(sensorDataSubscribeService::subscribeOn)
                 .flatMap(this::publish);

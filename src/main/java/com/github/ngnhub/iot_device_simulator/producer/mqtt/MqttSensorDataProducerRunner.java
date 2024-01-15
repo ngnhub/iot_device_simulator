@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQTT_LOG_TAG;
 import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST;
 
+// TODO: 15.01.2024 test
 @Slf4j
 @ConditionalOnBean(MqttSensorDataProducer.class)
 @Component
@@ -36,6 +37,7 @@ public class MqttSensorDataProducerRunner {
     private void handleError(Throwable err) {
         log.error("{} Error occurred while publishing mqtt messages: {}", MQTT_LOG_TAG, err.getMessage());
         if (err instanceof MqttException && REASON_CODE_CONNECTION_LOST == ((MqttException) err).getReasonCode()) {
+            log.info("{} Try to revive mqtt connection...", MQTT_LOG_TAG);
             scheduleRetry();
         }
     }
@@ -57,7 +59,7 @@ public class MqttSensorDataProducerRunner {
                 log.info("{} Mqtt publishing revived", MQTT_LOG_TAG);
             } else {
                 scheduleRetry();
-                log.debug("{} Mqtt client is still disconnected", MQTT_LOG_TAG);
+                log.info("{} Mqtt client is still disconnected...", MQTT_LOG_TAG);
             }
         };
     }

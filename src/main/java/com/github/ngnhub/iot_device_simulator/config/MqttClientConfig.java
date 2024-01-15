@@ -28,6 +28,7 @@ public class MqttClientConfig {
         return mqttClient;
     }
 
+    // TODO: 15.01.2024 reconnection delay to props
     @Bean
     public MqttConnectOptions mqttOptions(MqttProps props) {
         var options = new MqttConnectOptions();
