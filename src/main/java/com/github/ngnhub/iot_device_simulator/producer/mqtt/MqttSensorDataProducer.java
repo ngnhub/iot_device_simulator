@@ -27,7 +27,7 @@ import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQT
 @ConditionalOnBean(MqttClient.class)
 public class MqttSensorDataProducer {
 
-    private static final int DEFAULT_QOS = 2;
+    private static final int DEFAULT_QOS = 2; // TODO: 15.01.2024 props
 
     private final SensorDataSubscribeService sensorDataSubscribeService;
     private final SensorDescriptionStorage storage;

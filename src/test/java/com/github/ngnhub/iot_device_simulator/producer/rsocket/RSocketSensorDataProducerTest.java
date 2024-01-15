@@ -1,6 +1,5 @@
-package com.github.ngnhub.iot_device_simulator.producer;
+package com.github.ngnhub.iot_device_simulator.producer.rsocket;
 
-import com.github.ngnhub.iot_device_simulator.config.SensorDataPublisherConfig;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -21,9 +20,8 @@ import org.springframework.util.CollectionUtils;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.gpio;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-// FIXME: 15.01.2024
-@SpringBootTest(properties = "mqtt.enabled=false")
-@Import({RSocketSensorDataProducerTest.Config.class, SensorDataPublisherConfig.class})
+@SpringBootTest
+@Import(RSocketSensorDataProducerTest.Config.class)
 class RSocketSensorDataProducerTest {
 
     @TestConfiguration
