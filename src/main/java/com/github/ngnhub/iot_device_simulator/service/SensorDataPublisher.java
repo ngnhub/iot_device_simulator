@@ -1,5 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
+import com.github.ngnhub.iot_device_simulator.error.SinkOverflowException;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Sinks;
@@ -23,7 +24,12 @@ public class SensorDataPublisher {
     }
 
     private Map<String, Sinks.Many<SensorData>> fanOut(SensorData data, Map<String, Sinks.Many<SensorData>> queues) {
-        queues.values().forEach(sink -> sink.tryEmitNext(data));
+        queues.values().forEach(sink -> {
+            Sinks.EmitResult result = sink.tryEmitNext(data);
+            if (result == Sinks.EmitResult.FAIL_OVERFLOW) {
+                throw new SinkOverflowException();
+            }
+        });
         return queues;
     }
 

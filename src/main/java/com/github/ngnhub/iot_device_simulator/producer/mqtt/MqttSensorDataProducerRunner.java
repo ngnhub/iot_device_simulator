@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import reactor.core.scheduler.Schedulers;
+import reactor.core.scheduler.Scheduler;
 
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.EventListener;
@@ -25,6 +26,11 @@ public class MqttSensorDataProducerRunner {
     private final MqttSensorDataProducer publisher;
     private final MqttConnectOptions options;
 
+    @Lookup
+    public Scheduler singleThreadScheduler() {
+        return null;
+    }
+
     @EventListener(ApplicationContextEvent.class)
     public void runMqtt() {
         publisher.subscribeAndProduce()
@@ -36,6 +42,7 @@ public class MqttSensorDataProducerRunner {
     private void handleError(Throwable err) {
         log.error("{} Error occurred while publishing mqtt messages: {}", MQTT_LOG_TAG, err.getMessage());
         if (err instanceof MqttException && REASON_CODE_CONNECTION_LOST == ((MqttException) err).getReasonCode()) {
+            log.info("{} Try to revive mqtt connection...", MQTT_LOG_TAG);
             scheduleRetry();
         }
     }
@@ -47,7 +54,7 @@ public class MqttSensorDataProducerRunner {
      */
     private void scheduleRetry() {
         int reconnectionDelay = options.getMaxReconnectDelay() / 2;
-        Schedulers.single().schedule(retryTask(), reconnectionDelay, TimeUnit.MILLISECONDS);
+        singleThreadScheduler().schedule(retryTask(), reconnectionDelay, TimeUnit.MILLISECONDS);
     }
 
     private Runnable retryTask() {
@@ -57,7 +64,7 @@ public class MqttSensorDataProducerRunner {
                 log.info("{} Mqtt publishing revived", MQTT_LOG_TAG);
             } else {
                 scheduleRetry();
-                log.debug("{} Mqtt client is still disconnected", MQTT_LOG_TAG);
+                log.info("{} Mqtt client is still disconnected...", MQTT_LOG_TAG);
             }
         };
     }
