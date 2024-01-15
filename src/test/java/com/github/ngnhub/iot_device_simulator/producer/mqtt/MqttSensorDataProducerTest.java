@@ -70,7 +70,7 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(sensorDataSubscribeService.subscribeOn(temperatureTopic)).thenReturn(Flux.just(temperatureData));
 
         // when
-        Flux<Object> flux = producer.subscribeAndProduce().take(2);
+        Flux<Void> flux = producer.subscribeAndProduce().take(2);
 
         // then
         StepVerifier.create(flux).verifyComplete();
@@ -99,7 +99,7 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
-        Flux<Object> flux = producer.subscribeAndProduce().take(1);
+        Flux<Void> flux = producer.subscribeAndProduce().take(1);
 
         // then
         StepVerifier.create(flux).verifyComplete();
@@ -117,7 +117,7 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
-        Flux<Object> flux = producer.subscribeAndProduce().take(1);
+        Flux<Void> flux = producer.subscribeAndProduce().take(1);
 
         // then
         StepVerifier.create(flux).verifyComplete();
@@ -138,7 +138,7 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
-        Flux<Object> flux = producer.subscribeAndProduce().take(1);
+        Flux<Void> flux = producer.subscribeAndProduce().take(1);
 
         // then
         StepVerifier.create(flux).verifyComplete();

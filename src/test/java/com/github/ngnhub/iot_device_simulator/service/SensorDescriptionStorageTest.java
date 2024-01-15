@@ -4,9 +4,7 @@ import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;

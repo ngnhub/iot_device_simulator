@@ -13,23 +13,23 @@ import java.util.List;
 
 @UtilityClass
 public class TestSensorDescriptionFactory {
-    private static final List<SensorDescription> DESCRIPTIONS;
-
-    static {
-        try {
-            File file = ResourceUtils.getFile("classpath:test_sensors.json");
-            var mapper = new ObjectMapper();
-            DESCRIPTIONS = mapper.readValue(file, new TypeReference<>() {});
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static SensorDescription gpio() {
-        return DESCRIPTIONS.get(0);
+        return getSensorDescription(0);
     }
 
     public static SensorDescription temperature() {
-        return DESCRIPTIONS.get(1);
+        return getSensorDescription(1);
+    }
+
+    private static SensorDescription getSensorDescription(int index) {
+        try {
+            File file = ResourceUtils.getFile("classpath:test_sensors.json");
+            var mapper = new ObjectMapper();
+            List<SensorDescription> values = mapper.readValue(file, new TypeReference<>() {});
+            return values.get(index);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

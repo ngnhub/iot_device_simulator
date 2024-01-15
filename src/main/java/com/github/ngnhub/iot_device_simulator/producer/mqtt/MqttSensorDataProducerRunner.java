@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import reactor.core.scheduler.Schedulers;
+import reactor.core.scheduler.Scheduler;
 
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.EventListener;
@@ -16,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQTT_LOG_TAG;
 import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST;
 
-// TODO: 15.01.2024 test
 @Slf4j
 @ConditionalOnBean(MqttSensorDataProducer.class)
 @Component
@@ -25,6 +25,11 @@ public class MqttSensorDataProducerRunner {
 
     private final MqttSensorDataProducer publisher;
     private final MqttConnectOptions options;
+
+    @Lookup
+    public Scheduler singleThreadScheduler() {
+        return null;
+    }
 
     @EventListener(ApplicationContextEvent.class)
     public void runMqtt() {
@@ -49,7 +54,7 @@ public class MqttSensorDataProducerRunner {
      */
     private void scheduleRetry() {
         int reconnectionDelay = options.getMaxReconnectDelay() / 2;
-        Schedulers.single().schedule(retryTask(), reconnectionDelay, TimeUnit.MILLISECONDS);
+        singleThreadScheduler().schedule(retryTask(), reconnectionDelay, TimeUnit.MILLISECONDS);
     }
 
     private Runnable retryTask() {
