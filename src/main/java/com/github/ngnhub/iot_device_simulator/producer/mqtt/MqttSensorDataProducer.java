@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-//TODO: 09.01.2024 error handling
-//TODO: 09.01.2024 test
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -54,8 +52,8 @@ public class MqttSensorDataProducer {
         return mqttClient.isConnected();
     }
 
-    private Mono<Object> publish(SensorData data) {
-        return Mono.fromCallable(() -> {
+    private Mono<Void> publish(SensorData data) {
+        Mono<Void> mono = Mono.fromCallable(() -> {
             var topic = generateTopic(data.getTopic());
             var mqttMessage = new MqttMessage();
             mqttMessage.setQos(data.getQos() == null ? DEFAULT_QOS : data.getQos());
@@ -63,7 +61,8 @@ public class MqttSensorDataProducer {
             mqttMessage.setPayload(payload);
             sendMessage(topic, mqttMessage);
             return null;
-        }).subscribeOn(Schedulers.boundedElastic());
+        });
+        return mono.subscribeOn(Schedulers.boundedElastic());
     }
 
     private void sendMessage(String topic, MqttMessage mqttMessage) throws MqttException {
@@ -71,8 +70,23 @@ public class MqttSensorDataProducer {
     }
 
     private String generateTopic(String sensor) {
-        var messageId = UUID.randomUUID(); // TODO: 10.01.2024 switcher, it may be unnecassery
         var topicBasePath = props.getTopicBasePath();
+        if (props.isEnableTopicUniqueIds()) {
+            return generateUniqueTopic(sensor, topicBasePath);
+        } else {
+            return generateCommonTopic(sensor, topicBasePath);
+        }
+    }
+
+    private String generateCommonTopic(String sensor, String topicBasePath) {
+        if (topicBasePath == null) {
+            return sensor;
+        }
+        return String.format("%s/%s", topicBasePath, sensor);
+    }
+
+    private String generateUniqueTopic(String sensor, String topicBasePath) {
+        var messageId = UUID.randomUUID();
         if (topicBasePath == null) {
             return String.format("%s/%s", messageId, sensor);
         }

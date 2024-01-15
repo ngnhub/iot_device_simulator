@@ -1,5 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
+import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
-class SensorDataPublisherTest {
+class SensorDataPublisherTest extends BaseTest {
 
     private ConcurrentHashMap<String, Map<String, Sinks.Many<SensorData>>> topicToMessageQueues;
     private SensorDataPublisher publisher;
