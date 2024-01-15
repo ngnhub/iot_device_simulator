@@ -1,14 +1,13 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
-import com.github.ngnhub.iot_device_simulator.error.SinkOverflowException;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Sinks;
 
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,39 +15,33 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class SensorDataPublisher {
 
-    private final ConcurrentHashMap<String, Map<String, Sinks.Many<SensorData>>> topicToMessageQueues;
+    private final ConcurrentHashMap<String, Map<String, DataConsumer>> topicToMessageQueues;
 
     public void publish(SensorData data) {
         var topic = data.getTopic();
-        topicToMessageQueues.computeIfPresent(topic, (key, queues) -> fanOut(data, queues));
+        topicToMessageQueues.computeIfPresent(topic, (key, consumers) -> fanOut(data, consumers));
     }
 
-    private Map<String, Sinks.Many<SensorData>> fanOut(SensorData data, Map<String, Sinks.Many<SensorData>> queues) {
-        queues.values().forEach(sink -> {
-            Sinks.EmitResult result = sink.tryEmitNext(data);
-            if (result == Sinks.EmitResult.FAIL_OVERFLOW) {
-                throw new SinkOverflowException();
-            }
-        });
-        return queues;
+    private Map<String, DataConsumer> fanOut(SensorData data, Map<String, DataConsumer> consumers) {
+        consumers.values().forEach(listener -> listener.consume(data));
+        return consumers;
     }
 
-    public SinkKey subscribe(String topic) {
+    public String subscribe(String topic, DataConsumer consumer) {
         var id = UUID.randomUUID().toString();
-        var sink = addNewQueue(topic, id);
-        return new SinkKey(id, sink);
+        addNewConsumer(topic, id, consumer);
+        return id;
     }
 
-    private Sinks.Many<SensorData> addNewQueue(String topic, String id) {
-        Sinks.Many<SensorData> sink = Sinks.many().unicast().onBackpressureBuffer();
+    // TODO: 15.01.2024 https://projectreactor.io/docs/core/release/reference/#producing.create
+    private void addNewConsumer(String topic, String id, DataConsumer consumer) {
         topicToMessageQueues.compute(topic, (key, queues) -> {
             if (queues == null) {
                 queues = new HashMap<>();
             }
-            queues.put(id, sink);
+            queues.put(id, consumer);
             return queues;
         });
-        return sink;
     }
 
     public void unsubscribe(String topic, String id) {
@@ -58,5 +51,9 @@ public class SensorDataPublisher {
         });
     }
 
-    public record SinkKey(String subscriberId, Sinks.Many<SensorData> sink) {}
+    public record SinkKey(String subscriberId, Queue<SensorData> sink) {}
+
+    public interface DataConsumer {
+        void consume(SensorData data);
+    }
 }

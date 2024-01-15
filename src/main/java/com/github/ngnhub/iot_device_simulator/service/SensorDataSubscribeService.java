@@ -2,11 +2,9 @@ package com.github.ngnhub.iot_device_simulator.service;
 
 import com.github.ngnhub.iot_device_simulator.error.SinkOverflowException;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.SensorDataPublisher.SinkKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import reactor.util.retry.RetryBackoffSpec;
 
@@ -33,15 +31,17 @@ public class SensorDataSubscribeService {
     }
 
     private Flux<SensorData> consumeData(String topic) {
-        return Mono.fromCallable(() -> subscribeAndGetQueue(topic))
-                .flatMapMany(sinkKey -> sinkKey.sink().asFlux()
-                        .doFinally(s -> publisher.unsubscribe(topic, sinkKey.subscriberId())));
+        return Flux.create(sink -> {
+            String id = subscribe(topic, sink::next);
+            sink.onCancel(() -> publisher.unsubscribe(topic, id));
+            sink.onDispose(() -> publisher.unsubscribe(topic, id));
+        });
     }
 
-    private SinkKey subscribeAndGetQueue(String topic) {
-        SinkKey subscription = publisher.subscribe(topic);
-        log.debug("{} Subscribed on topic {}. Subscriber id: {}", LOG_TAG, topic, subscription.subscriberId());
-        return subscription;
+    private String subscribe(String topic, SensorDataPublisher.DataConsumer dataConsumer) {
+        var id = publisher.subscribe(topic, dataConsumer);
+        log.debug("{} Subscribed on topic {}. Subscriber id: {}", LOG_TAG, topic, id);
+        return id;
     }
 
     private static RetryBackoffSpec getRetrySpec() {
