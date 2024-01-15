@@ -11,28 +11,19 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-// TODO: 10.01.2024 error handling
-// TODO: 10.01.2024 limits
-// TODO: 10.01.2024 tests
 @Component
 @RequiredArgsConstructor
 public class SensorDataPublisher {
 
-    private final ConcurrentHashMap<String,
-            Map<String, Sinks.Many<SensorData>>> TOPICS_TO_MESSAGE_QUEUES = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Map<String, Sinks.Many<SensorData>>> topicToMessageQueues;
 
     public void publish(SensorData data) {
         var topic = data.getTopic();
-        TOPICS_TO_MESSAGE_QUEUES.compute(topic, (key, queues) -> fanOut(data, queues));
+        topicToMessageQueues.computeIfPresent(topic, (key, queues) -> fanOut(data, queues));
     }
 
-    private Map<String, Sinks.Many<SensorData>> fanOut(SensorData data,
-                                                       Map<String, Sinks.Many<SensorData>> queues) {
-        if (queues == null) {
-            queues = new HashMap<>(100);
-        } else {
-            queues.values().forEach(sink -> sink.tryEmitNext(data));
-        }
+    private Map<String, Sinks.Many<SensorData>> fanOut(SensorData data, Map<String, Sinks.Many<SensorData>> queues) {
+        queues.values().forEach(sink -> sink.tryEmitNext(data));
         return queues;
     }
 
@@ -44,7 +35,7 @@ public class SensorDataPublisher {
 
     private Sinks.Many<SensorData> addNewQueue(String topic, String id) {
         Sinks.Many<SensorData> sink = Sinks.many().unicast().onBackpressureBuffer();
-        TOPICS_TO_MESSAGE_QUEUES.compute(topic, (key, queues) -> {
+        topicToMessageQueues.compute(topic, (key, queues) -> {
             if (queues == null) {
                 queues = new HashMap<>();
             }
@@ -55,7 +46,7 @@ public class SensorDataPublisher {
     }
 
     public void unsubscribe(String topic, String id) {
-        TOPICS_TO_MESSAGE_QUEUES.computeIfPresent(topic, (key, val) -> {
+        topicToMessageQueues.computeIfPresent(topic, (ignore, val) -> {
             val.remove(id);
             return val;
         });

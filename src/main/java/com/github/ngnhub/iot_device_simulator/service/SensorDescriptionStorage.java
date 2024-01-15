@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+// TODO: 14.01.2024 allow turn on / turn off types
 @Service
 public class SensorDescriptionStorage {
 
