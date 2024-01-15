@@ -1,6 +1,5 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
-import com.github.ngnhub.iot_device_simulator.event.SensorValueUpdatedEvent;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.test.scheduler.VirtualTimeScheduler;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
@@ -36,14 +34,14 @@ class SensorDataSimulatorTest {
     @Mock
     private SensorDescriptionStorage storage;
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private SensorDataPublisher datPublisher;
     @Captor
-    private ArgumentCaptor<SensorValueUpdatedEvent> eventArgumentCaptor;
+    private ArgumentCaptor<SensorData> eventArgumentCaptor;
     private SensorDataSimulator simulator;
 
     @BeforeEach
     void setUp() {
-        simulator = new SensorDataSimulator(storage, eventPublisher);
+        simulator = new SensorDataSimulator(storage, datPublisher);
     }
 
     @Test
@@ -62,16 +60,16 @@ class SensorDataSimulatorTest {
         scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
-        verify(eventPublisher, times(2)).publishEvent(eventArgumentCaptor.capture());
-        List<SensorValueUpdatedEvent> allValues = eventArgumentCaptor.getAllValues();
+        verify(datPublisher, times(2)).publish(eventArgumentCaptor.capture());
+        List<SensorData> allValues = eventArgumentCaptor.getAllValues();
         assertEquals(2, allValues.size());
 
-        SensorData gpioCaptured = allValues.get(0).data();
+        SensorData gpioCaptured = allValues.get(0);
         assertEquals(gpio.topic(), gpioCaptured.getTopic());
         assertFalse(CollectionUtils.isEmpty(gpio.possibleValues()));
         assertTrue(gpio.possibleValues().contains(gpioCaptured.getSensorData()));
 
-        SensorData temperatureCaptured = allValues.get(1).data();
+        SensorData temperatureCaptured = allValues.get(1);
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
         double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
         assertNotNull(temperature.min());
@@ -96,8 +94,8 @@ class SensorDataSimulatorTest {
         scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
-        verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData temperatureCaptured = eventArgumentCaptor.getValue().data();
+        verify(datPublisher).publish(eventArgumentCaptor.capture());
+        SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
         double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
         assertNull(temperature.min());
@@ -122,8 +120,8 @@ class SensorDataSimulatorTest {
         scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
-        verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData temperatureCaptured = eventArgumentCaptor.getValue().data();
+        verify(datPublisher).publish(eventArgumentCaptor.capture());
+        SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
         double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
         assertNotNull(temperature.min());
@@ -149,8 +147,8 @@ class SensorDataSimulatorTest {
         scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
-        verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData temperatureCaptured = eventArgumentCaptor.getValue().data();
+        verify(datPublisher).publish(eventArgumentCaptor.capture());
+        SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
         double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
         assertNull(temperature.min());
@@ -176,8 +174,8 @@ class SensorDataSimulatorTest {
         scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
-        verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData gpioCaptured = eventArgumentCaptor.getValue().data();
+        verify(datPublisher).publish(eventArgumentCaptor.capture());
+        SensorData gpioCaptured = eventArgumentCaptor.getValue();
         assertEquals(gpio.topic(), gpioCaptured.getTopic());
         assertTrue(CollectionUtils.isEmpty(gpio.possibleValues()));
         assertEquals(
@@ -203,8 +201,8 @@ class SensorDataSimulatorTest {
         scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
-        verify(eventPublisher).publishEvent(eventArgumentCaptor.capture());
-        SensorData gpioCaptured = eventArgumentCaptor.getValue().data();
+        verify(datPublisher).publish(eventArgumentCaptor.capture());
+        SensorData gpioCaptured = eventArgumentCaptor.getValue();
         assertEquals(gpio.topic(), gpioCaptured.getTopic());
         assertEquals(
                 "Error {Unsupported type: " + gpio.type() + "}",

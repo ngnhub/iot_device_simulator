@@ -5,3 +5,7 @@ spring:
 sensor-descriptor-path: 'classpath:test_sensors.json'
 mqtt:
   enabled: false
+
+logging:
+  level:
+    com.github.ngnhub.iot_device_simulator: debug

@@ -10,3 +10,7 @@ mqtt:
   port: 1883
   username: 'admin'
   password: 'admin'
+
+logging:
+  level:
+    com.github.ngnhub.iot_device_simulator: debug
