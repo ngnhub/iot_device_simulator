@@ -1,5 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.utils;
 
+import com.github.ngnhub.iot_device_simulator.BaseTest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
@@ -17,8 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class JakartaValidatorWrapperTest {
+class JakartaValidatorWrapperTest extends BaseTest {
 
     @Mock
     private Validator validator;

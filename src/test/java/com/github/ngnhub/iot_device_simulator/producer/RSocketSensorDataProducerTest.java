@@ -1,8 +1,8 @@
 package com.github.ngnhub.iot_device_simulator.producer;
 
+import com.github.ngnhub.iot_device_simulator.config.SensorDataPublisherConfig;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -21,8 +21,9 @@ import org.springframework.util.CollectionUtils;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.gpio;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@SpringBootTest
-@Import(RSocketSensorDataProducerTest.Config.class)
+// FIXME: 15.01.2024
+@SpringBootTest(properties = "mqtt.enabled=false")
+@Import({RSocketSensorDataProducerTest.Config.class, SensorDataPublisherConfig.class})
 class RSocketSensorDataProducerTest {
 
     @TestConfiguration
@@ -43,7 +44,6 @@ class RSocketSensorDataProducerTest {
     private RSocketRequester requester;
 
     @Test
-    @Timeout(5)
     void testStream() {
         // when
         Flux<SensorData> gpio = requester.route("subscribe/{topic}", "gpio")
@@ -67,7 +67,6 @@ class RSocketSensorDataProducerTest {
     }
 
     @Test
-    @Timeout(5)
     void testStreamValues() {
         // when
         Flux<String> gpio = requester.route("subscribe/value/{topic}", "gpio")

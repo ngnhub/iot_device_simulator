@@ -1,10 +1,12 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
+import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.error.SinkOverflowException;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataPublisher.SinkKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,8 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class SensorDataSubscribeServiceTest {
+class SensorDataSubscribeServiceTest extends BaseTest {
 
     @Mock
     private SensorDataPublisher publisher;
@@ -77,6 +78,7 @@ class SensorDataSubscribeServiceTest {
     }
 
     @Test
+    @Timeout(15)
     void shouldResubscribeIfSinkOverflow() {
         // given
         var topic = "topic";
@@ -104,6 +106,7 @@ class SensorDataSubscribeServiceTest {
     }
 
     @Test
+    @Timeout(15)
     void shouldNotResubscribeAfterSeveralAttemptsFailed() {
         // given
         var topic = "topic";

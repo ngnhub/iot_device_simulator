@@ -1,5 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
+import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,7 @@ import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescripti
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
-class SensorDescriptionStorageTest {
+class SensorDescriptionStorageTest extends BaseTest {
 
     @Mock
     private SensorDescriptionValidator validator;
