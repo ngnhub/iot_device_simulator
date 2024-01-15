@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SensorDataPublisherConfig {
 
     @Bean
-    public Map<String, Sinks.Many<SensorData>> topicToMessageQueues() {
+    public ConcurrentHashMap<String, Map<String, Sinks.Many<SensorData>>> topicToMessageQueues() {
         return new ConcurrentHashMap<>();
     }
 }
