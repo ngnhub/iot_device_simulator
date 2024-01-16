@@ -57,6 +57,29 @@ class SensorDataPublisherTest extends BaseTest {
     }
 
     @Test
+    void shouldSendErrored() {
+        // given
+        var topic = "topic";
+        var data = getSensorData(topic, "on");
+        data.setErrored(true);
+        Map<String, SensorDataListener> queues = new HashMap<>();
+        var key1 = "key1";
+        var key2 = "key2";
+        SensorDataListener consumer1 = spy(new TestSensorDataListener());
+        SensorDataListener consumer2 = spy(new TestSensorDataListener());
+        queues.put(key1, consumer1);
+        queues.put(key2, consumer2);
+        topicToMessageQueues.put(topic, queues);
+
+        // when
+        publisher.publish(data);
+
+        // then
+        verify(consumer1, times(1)).onError(data);
+        verify(consumer2, times(1)).onError(data);
+    }
+
+    @Test
     void shouldAddNewMapToTopic() {
         // given
         var topic = "topic";

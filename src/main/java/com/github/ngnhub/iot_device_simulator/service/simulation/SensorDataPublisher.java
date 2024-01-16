@@ -25,7 +25,7 @@ public class SensorDataPublisher {
         consumers.values().forEach(listener -> {
             listener.onData(data);
             if (data.isErrored()) {
-                listener.onData(data);
+                listener.onError(data);
             }
         });
         return consumers;
