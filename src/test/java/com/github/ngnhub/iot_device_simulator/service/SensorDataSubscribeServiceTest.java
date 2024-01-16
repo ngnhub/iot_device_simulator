@@ -148,4 +148,32 @@ class SensorDataSubscribeServiceTest {
                 .verify();
         verify(publisher).subscribe(eq(topic), any());
     }
+
+    @Test
+    void shouldReturnAndUnsubscribeOnError() {
+        // given
+        var topic = "topic";
+        SensorData data1 = getSensorData(topic, "1");
+        SensorData data2 = getSensorData(topic, "2");
+        SensorData data3 = getSensorData(topic, "3");
+        var keyId = "id";
+        when(publisher.subscribe(eq(topic), any())).thenAnswer(a -> {
+            SensorDataListener argument = a.getArgument(1);
+            argument.onData(data1);
+            argument.onData(data2);
+            argument.onError(data3);
+            return keyId;
+        });
+
+        // when
+        Flux<SensorData> result = service.subscribeOn(topic).take(5);
+
+        // then
+        StepVerifier.create(result)
+                .expectNext(data1)
+                .expectNext(data2)
+                .expectNext(data3)
+                .verifyComplete();
+        verify(publisher).unsubscribe(topic, keyId);
+    }
 }

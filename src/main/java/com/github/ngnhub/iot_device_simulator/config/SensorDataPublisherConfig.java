@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SensorDataPublisherConfig {
 
     @Bean
-    public ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageQueues() {
+    public ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageListeners() {
         return new ConcurrentHashMap<>();
     }
 }
