@@ -1,11 +1,13 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
-import com.github.ngnhub.iot_device_simulator.error.SinkOverflowException;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.util.retry.Retry;
 import reactor.util.retry.RetryBackoffSpec;
 
@@ -33,22 +35,36 @@ public class SensorDataSubscribeService {
 
     private Flux<SensorData> consumeData(String topic) {
         return Flux.create(sink -> {
-            String id = subscribe(topic, sink::next);
-            sink.onCancel(() -> publisher.unsubscribe(topic, id));
+            String id = subscribe(topic, new SensorDataListenerImpl(sink));
             sink.onDispose(() -> publisher.unsubscribe(topic, id));
         });
     }
 
-    private String subscribe(String topic, SensorDataPublisher.DataConsumer dataConsumer) {
-        var id = publisher.subscribe(topic, dataConsumer);
+    private String subscribe(String topic, SensorDataListener sensorDataListener) {
+        var id = publisher.subscribe(topic, sensorDataListener);
         log.debug("{} Subscribed on topic {}. Subscriber id: {}", LOG_TAG, topic, id);
         return id;
     }
 
     private static RetryBackoffSpec getRetrySpec() {
         return Retry.fixedDelay(RETRY_ATTEMPTS, Duration.ofMillis(RETRY_DELAY_MILLIS))
-                .filter(err -> err instanceof SinkOverflowException)
-                .onRetryExhaustedThrow((ignore1, ignore2) -> new SinkOverflowException(
-                        "Subscription on topic failed after {} retries. Consumer processes data too slowly"));
+                .filter(Exceptions::isOverflow)
+                .onRetryExhaustedThrow((ignore1, ignore2) -> Exceptions.failWithOverflow(
+                        "Subscription on topic failed after " + RETRY_ATTEMPTS
+                                + " retries. Consumer processes data too slowly"));
+    }
+
+    private record SensorDataListenerImpl(FluxSink<SensorData> dataFluxSink) implements SensorDataListener {
+
+        @Override
+        public void onData(SensorData data) {
+            dataFluxSink.next(data);
+        }
+
+        @Override
+        public void onError(SensorData data) {
+            dataFluxSink.next(data);
+            dataFluxSink.complete();
+        }
     }
 }

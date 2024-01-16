@@ -45,7 +45,9 @@ tasks.withType<Test> {
     tasks.named<Test>("test") {
         useJUnitPlatform()
 
-        maxHeapSize = "512M"
+        maxHeapSize = "1024M"
+
+        maxParallelForks = 4 // FIXME: only work with this
 
         testLogging {
             events("passed", "failed")

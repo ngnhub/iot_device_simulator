@@ -14,25 +14,30 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class SensorDataPublisher {
 
-    private final ConcurrentHashMap<String, Map<String, DataConsumer>> topicToMessageQueues;
+    private final ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageQueues;
 
     public void publish(SensorData data) {
         var topic = data.getTopic();
         topicToMessageQueues.computeIfPresent(topic, (key, consumers) -> fanOut(data, consumers));
     }
 
-    private Map<String, DataConsumer> fanOut(SensorData data, Map<String, DataConsumer> consumers) {
-        consumers.values().forEach(listener -> listener.consume(data));
+    private Map<String, SensorDataListener> fanOut(SensorData data, Map<String, SensorDataListener> consumers) {
+        consumers.values().forEach(listener -> {
+            listener.onData(data);
+            if (data.isErrored()) {
+                listener.onData(data);
+            }
+        });
         return consumers;
     }
 
-    public String subscribe(String topic, DataConsumer consumer) {
+    public String subscribe(String topic, SensorDataListener consumer) {
         var id = UUID.randomUUID().toString();
         addNewConsumer(topic, id, consumer);
         return id;
     }
 
-    private void addNewConsumer(String topic, String id, DataConsumer consumer) {
+    private void addNewConsumer(String topic, String id, SensorDataListener consumer) {
         topicToMessageQueues.compute(topic, (key, queues) -> {
             if (queues == null) {
                 queues = new HashMap<>();
@@ -49,7 +54,9 @@ public class SensorDataPublisher {
         });
     }
 
-    public interface DataConsumer {
-        void consume(SensorData data);
+    public interface SensorDataListener {
+        void onData(SensorData data);
+
+        void onError(SensorData data);
     }
 }

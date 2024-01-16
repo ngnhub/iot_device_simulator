@@ -1,20 +1,23 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
-import com.github.ngnhub.iot_device_simulator.error.SinkOverflowException;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.SensorDataPublisher.SinkKey;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFactory.getSensorData;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,17 +41,17 @@ class SensorDataSubscribeServiceTest {
         SensorData data1 = getSensorData(topic, "1");
         SensorData data2 = getSensorData(topic, "2");
         SensorData data3 = getSensorData(topic, "3");
-        Sinks.Many<SensorData> sink = Sinks.many().unicast().onBackpressureBuffer();
         var keyId = "id";
-        var sinkKey = new SinkKey(keyId, sink);
-        when(publisher.subscribe(topic)).thenReturn(sinkKey);
+        when(publisher.subscribe(eq(topic), any())).thenAnswer(a -> {
+            SensorDataListener argument = a.getArgument(1);
+            Schedulers.single().schedule(() -> argument.onData(data1), 1, TimeUnit.SECONDS);
+            Schedulers.single().schedule(() -> argument.onData(data2), 1, TimeUnit.SECONDS);
+            Schedulers.single().schedule(() -> argument.onData(data3), 1, TimeUnit.SECONDS);
+            return keyId;
+        });
 
         // when
-        Flux<SensorData> result = service.subscribeOn(topic).subscribeOn(Schedulers.single());
-        sink.tryEmitNext(data1);
-        sink.tryEmitNext(data2);
-        sink.tryEmitNext(data3);
-        sink.tryEmitComplete();
+        Flux<SensorData> result = service.subscribeOn(topic).take(3);
 
         // then
         StepVerifier.create(result)
@@ -60,81 +63,92 @@ class SensorDataSubscribeServiceTest {
     }
 
     @Test
-    void shouldUnsubscribeFinallyIfErrored() {
+    void shouldSendErrorAndUnsubscribeFinallyIfErrored() {
         // given
         var topic = "topic";
-        Sinks.Many<SensorData> sink = Sinks.many().unicast().onBackpressureBuffer();
+        SensorData data1 = getSensorData(topic, "1");
+        SensorData errored = getSensorData(topic, "Error");
+        errored.setErrored(true);
         var keyId = "id";
-        var sinkKey = new SinkKey(keyId, sink);
-        when(publisher.subscribe(topic)).thenReturn(sinkKey);
+        when(publisher.subscribe(eq(topic), any())).thenAnswer(a -> {
+            SensorDataListener argument = a.getArgument(1);
+            Schedulers.single().schedule(() -> argument.onData(data1), 500, TimeUnit.MILLISECONDS);
+            Schedulers.single().schedule(() -> argument.onError(errored), 1000, TimeUnit.MILLISECONDS);
+            return keyId;
+        });
 
         // when
         Flux<SensorData> result = service.subscribeOn(topic);
-        sink.tryEmitError(new RuntimeException("Simulate error"));
 
         // then
         StepVerifier.create(result)
-                .verifyErrorMatches(err -> err instanceof RuntimeException && "Simulate error".equals(err.getMessage()));
+                .expectNext(data1)
+                .expectNext(errored)
+                .verifyComplete();
         verify(publisher).unsubscribe(topic, keyId);
     }
 
-    @Disabled
     @Test
     void shouldResubscribeIfSinkOverflow() {
         // given
         var topic = "topic";
         SensorData data = getSensorData(topic, "1");
-        Sinks.Many<SensorData> sinkErrored = Sinks.many().unicast().onBackpressureBuffer();
-        Sinks.Many<SensorData> sinkReSubscribed = Sinks.many().unicast().onBackpressureBuffer();
         var keyId = "id";
-        var sinkKeyErrored = new SinkKey(keyId, sinkErrored);
-        var sinkKeyResubscribed = new SinkKey(keyId, sinkReSubscribed);
-        when(publisher.subscribe(topic))
-                .thenReturn(sinkKeyErrored)
-                .thenReturn(sinkKeyResubscribed);
+        when(publisher.subscribe(eq(topic), any()))
+                .thenThrow(Exceptions.failWithOverflow())
+                .thenThrow(Exceptions.failWithOverflow())
+                .thenAnswer(a -> {
+                    SensorDataListener argument = a.getArgument(1);
+                    Schedulers.single().schedule(() -> argument.onData(data), 1, TimeUnit.SECONDS);
+                    return keyId;
+                });
 
         // when
-        Flux<SensorData> result = service.subscribeOn(topic).subscribeOn(Schedulers.single());
-        sinkErrored.tryEmitError(new SinkOverflowException());
-        sinkReSubscribed.tryEmitNext(data);
-        sinkReSubscribed.tryEmitComplete();
+        Flux<SensorData> result = service.subscribeOn(topic).take(1);
 
         // then
         StepVerifier.create(result)
                 .expectNext(data)
                 .verifyComplete();
-        verify(publisher, times(2)).unsubscribe(topic, keyId);
+        verify(publisher, times(3)).subscribe(eq(topic), any());
     }
 
-    @Disabled
     @Test
-    void shouldNotResubscribeAfterSeveralAttemptsFailed() {
+    void shouldNotResubscribeIfSinkOverflowedMoreThanAttemptsNumber() {
         // given
         var topic = "topic";
-        Sinks.Many<SensorData> sinkErrored1 = Sinks.many().unicast().onBackpressureBuffer();
-        Sinks.Many<SensorData> sinkErrored2 = Sinks.many().unicast().onBackpressureBuffer();
-        Sinks.Many<SensorData> sinkErrored3 = Sinks.many().unicast().onBackpressureBuffer();
-        var keyId = "id";
-        var sinkKeyErrored1 = new SinkKey(keyId, sinkErrored1);
-        var sinkKeyErrored2 = new SinkKey(keyId, sinkErrored2);
-        var sinkKeyErrored3 = new SinkKey(keyId, sinkErrored3);
-        when(publisher.subscribe(topic))
-                .thenReturn(sinkKeyErrored1)
-                .thenReturn(sinkKeyErrored2)
-                .thenReturn(sinkKeyErrored3);
+        SensorData data = getSensorData(topic, "1");
+        when(publisher.subscribe(eq(topic), any()))
+                .thenThrow(Exceptions.failWithOverflow())
+                .thenThrow(Exceptions.failWithOverflow())
+                .thenThrow(Exceptions.failWithOverflow());
 
         // when
-        Flux<SensorData> result = service.subscribeOn(topic);
-        sinkErrored1.tryEmitError(new SinkOverflowException());
-        sinkErrored2.tryEmitError(new SinkOverflowException());
-        sinkErrored3.tryEmitError(new SinkOverflowException());
-        sinkErrored1.tryEmitComplete();
-        sinkErrored2.tryEmitComplete();
-        sinkErrored3.tryEmitComplete();
+        Flux<SensorData> result = service.subscribeOn(topic).take(3);
 
         // then
         StepVerifier.create(result)
-                .verifyError(SinkOverflowException.class);
-        verify(publisher, times(3)).unsubscribe(topic, keyId);
+                .expectErrorMatches(err -> Exceptions.isOverflow(err)
+                        && ("Subscription on topic failed after 2 retries." +
+                        " Consumer processes data too slowly").equals(err.getMessage()))
+                .verify();
+        verify(publisher, times(3)).subscribe(eq(topic), any());
+    }
+
+    @Test
+    void shouldNotResubscribeAfterOtherExceptions() {
+        // given
+        var topic = "topic";
+        when(publisher.subscribe(eq(topic), any()))
+                .thenThrow(RuntimeException.class);
+
+        // when
+        Flux<SensorData> result = service.subscribeOn(topic).take(3);
+
+        // then
+        StepVerifier.create(result)
+                .expectError(RuntimeException.class)
+                .verify();
+        verify(publisher).subscribe(eq(topic), any());
     }
 }

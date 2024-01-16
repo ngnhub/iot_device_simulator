@@ -3,7 +3,7 @@ package com.github.ngnhub.iot_device_simulator.service;
 import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.UUIDVerifier;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.DataConsumer;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -25,9 +26,7 @@ import static org.mockito.Mockito.verify;
 class SensorDataPublisherTest extends BaseTest {
 
     @Spy
-    private ConcurrentHashMap<String, Map<String, DataConsumer>> topicToMessageQueues = new ConcurrentHashMap<>();
-    @Spy
-    private TestDataConsumer testDataConsumer = new TestDataConsumer();
+    private ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageQueues = new ConcurrentHashMap<>();
     private SensorDataPublisher publisher;
 
     @BeforeEach
@@ -40,11 +39,11 @@ class SensorDataPublisherTest extends BaseTest {
         // given
         var topic = "topic";
         var data = getSensorData(topic, "on");
-        Map<String, DataConsumer> queues = new HashMap<>();
+        Map<String, SensorDataListener> queues = new HashMap<>();
         var key1 = "key1";
         var key2 = "key2";
-        DataConsumer consumer1 = testDataConsumer::doOnEvent;
-        DataConsumer consumer2 = testDataConsumer::doOnEvent;
+        SensorDataListener consumer1 = spy(new TestSensorDataListener());
+        SensorDataListener consumer2 = spy(new TestSensorDataListener());
         queues.put(key1, consumer1);
         queues.put(key2, consumer2);
         topicToMessageQueues.put(topic, queues);
@@ -53,14 +52,15 @@ class SensorDataPublisherTest extends BaseTest {
         publisher.publish(data);
 
         // then
-        verify(testDataConsumer, times(2)).doOnEvent(data);
+        verify(consumer1, times(1)).onData(data);
+        verify(consumer2, times(1)).onData(data);
     }
 
     @Test
     void shouldAddNewMapToTopic() {
         // given
         var topic = "topic";
-        DataConsumer consumer = testDataConsumer::doOnEvent;
+        SensorDataListener consumer = spy(new TestSensorDataListener());
 
         // when
         var key = publisher.subscribe(topic, consumer);
@@ -75,8 +75,8 @@ class SensorDataPublisherTest extends BaseTest {
         // given
         var topic = "topic";
         var subscriberId = "id";
-        DataConsumer consumer = testDataConsumer::doOnEvent;
-        Map<String, DataConsumer> map = new HashMap<>();
+        SensorDataListener consumer = spy(new TestSensorDataListener());
+        Map<String, SensorDataListener> map = new HashMap<>();
         map.put(subscriberId, consumer);
         topicToMessageQueues.put(topic, map);
         assertTrue(topicToMessageQueues.get(topic).containsKey(subscriberId));
@@ -93,7 +93,7 @@ class SensorDataPublisherTest extends BaseTest {
         // given
         var topic = "topic";
         var data = getSensorData(topic, "on");
-        DataConsumer consumer = testDataConsumer::doOnEvent;
+        SensorDataListener consumer = spy(new TestSensorDataListener());
 
         // when
         var key = publisher.subscribe(topic, consumer);

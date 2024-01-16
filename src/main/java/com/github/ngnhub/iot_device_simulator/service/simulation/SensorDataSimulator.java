@@ -100,6 +100,7 @@ public class SensorDataSimulator {
                 .sensorData("Error {" + exc.getMessage() + "}")
                 .time(LocalDateTime.now())
                 .qos(description.qos())
+                .errored(true)
                 .build();
     }
 }
