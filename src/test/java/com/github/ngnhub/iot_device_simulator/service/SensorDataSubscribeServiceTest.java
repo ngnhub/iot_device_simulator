@@ -10,10 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
-
-import java.util.concurrent.TimeUnit;
 
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFactory.getSensorData;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,9 +41,9 @@ class SensorDataSubscribeServiceTest {
         var keyId = "id";
         when(publisher.subscribe(eq(topic), any())).thenAnswer(a -> {
             SensorDataListener argument = a.getArgument(1);
-            Schedulers.single().schedule(() -> argument.onData(data1), 1, TimeUnit.SECONDS);
-            Schedulers.single().schedule(() -> argument.onData(data2), 1, TimeUnit.SECONDS);
-            Schedulers.single().schedule(() -> argument.onData(data3), 1, TimeUnit.SECONDS);
+            argument.onData(data1);
+            argument.onData(data2);
+            argument.onData(data3);
             return keyId;
         });
 
@@ -72,8 +69,8 @@ class SensorDataSubscribeServiceTest {
         var keyId = "id";
         when(publisher.subscribe(eq(topic), any())).thenAnswer(a -> {
             SensorDataListener argument = a.getArgument(1);
-            Schedulers.single().schedule(() -> argument.onData(data1), 500, TimeUnit.MILLISECONDS);
-            Schedulers.single().schedule(() -> argument.onError(errored), 1000, TimeUnit.MILLISECONDS);
+            argument.onData(data1);
+            argument.onError(errored);
             return keyId;
         });
 
@@ -99,7 +96,7 @@ class SensorDataSubscribeServiceTest {
                 .thenThrow(Exceptions.failWithOverflow())
                 .thenAnswer(a -> {
                     SensorDataListener argument = a.getArgument(1);
-                    Schedulers.single().schedule(() -> argument.onData(data), 1, TimeUnit.SECONDS);
+                    argument.onData(data);
                     return keyId;
                 });
 
@@ -124,7 +121,7 @@ class SensorDataSubscribeServiceTest {
                 .thenThrow(Exceptions.failWithOverflow());
 
         // when
-        Flux<SensorData> result = service.subscribeOn(topic).take(3);
+        Flux<SensorData> result = service.subscribeOn(topic).take(1);
 
         // then
         StepVerifier.create(result)
@@ -143,7 +140,7 @@ class SensorDataSubscribeServiceTest {
                 .thenThrow(RuntimeException.class);
 
         // when
-        Flux<SensorData> result = service.subscribeOn(topic).take(3);
+        Flux<SensorData> result = service.subscribeOn(topic).take(1);
 
         // then
         StepVerifier.create(result)

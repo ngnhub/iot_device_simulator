@@ -3,6 +3,7 @@ package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 import com.github.ngnhub.iot_device_simulator.BaseTest;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.when;
 
 class MqttSensorDataProducerRunnerTest extends BaseTest {
 
+    private static final VirtualTimeScheduler SCHEDULER = VirtualTimeScheduler.getOrSet();
+
     @Mock
     private MqttSensorDataProducer publisher;
     @Mock
@@ -32,6 +35,11 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
     @BeforeEach
     void setUp() {
         runner = spy(new MqttSensorDataProducerRunner(publisher, options));
+    }
+
+    @AfterAll
+    static void afterAll() {
+        SCHEDULER.dispose();
     }
 
     @Test
@@ -62,13 +70,13 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
                 .thenReturn(false)
                 .thenReturn(true);
 
-        VirtualTimeScheduler scheduler = VirtualTimeScheduler.getOrSet();
-        doReturn(scheduler).when(runner).singleThreadScheduler();
+
+        doReturn(SCHEDULER).when(runner).singleThreadScheduler();
 
         // when
         runner.runMqtt();
         long waitFor = 3000L;
-        scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
         StepVerifier.create(firstError).verifyError();

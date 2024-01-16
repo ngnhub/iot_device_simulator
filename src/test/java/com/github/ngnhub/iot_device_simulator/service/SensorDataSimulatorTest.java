@@ -6,6 +6,7 @@ import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataSimulator;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,6 +33,8 @@ import static org.mockito.Mockito.when;
 
 class SensorDataSimulatorTest extends BaseTest {
 
+    private static final VirtualTimeScheduler SCHEDULER = VirtualTimeScheduler.getOrSet();
+
     @Mock
     private SensorDescriptionStorage storage;
     @Mock
@@ -45,6 +48,11 @@ class SensorDataSimulatorTest extends BaseTest {
         simulator = new SensorDataSimulator(storage, datPublisher);
     }
 
+    @AfterAll
+    static void afterAll() {
+        SCHEDULER.dispose();
+    }
+
     @Test
     void shouldGenerateDoubleValuesBetweenZeroAndFive() {
         // given
@@ -52,13 +60,12 @@ class SensorDataSimulatorTest extends BaseTest {
         SensorDescription temperature = temperature();
         Flux<SensorDescription> fux = Flux.just(gpio, temperature);
         when(storage.getAll()).thenReturn(fux);
-        VirtualTimeScheduler scheduler = VirtualTimeScheduler.getOrSet();
         assertTrue(temperature.interval() > gpio.interval());
         Long waitFor = temperature.interval();
 
         // when
         simulator.startGenerateValues();
-        scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
         verify(datPublisher, times(2)).publish(eventArgumentCaptor.capture());
@@ -87,12 +94,12 @@ class SensorDataSimulatorTest extends BaseTest {
                 .min(null)
                 .build();
         when(storage.getAll()).thenReturn(Flux.just(temperature));
-        VirtualTimeScheduler scheduler = VirtualTimeScheduler.getOrSet();
+
         Long waitFor = temperature.interval();
 
         // when
         simulator.startGenerateValues();
-        scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
         verify(datPublisher).publish(eventArgumentCaptor.capture());
@@ -113,12 +120,12 @@ class SensorDataSimulatorTest extends BaseTest {
                 .max(null)
                 .build();
         when(storage.getAll()).thenReturn(Flux.just(temperature));
-        VirtualTimeScheduler scheduler = VirtualTimeScheduler.getOrSet();
+
         Long waitFor = temperature.interval();
 
         // when
         simulator.startGenerateValues();
-        scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
         verify(datPublisher).publish(eventArgumentCaptor.capture());
@@ -140,12 +147,12 @@ class SensorDataSimulatorTest extends BaseTest {
                 .max(null)
                 .build();
         when(storage.getAll()).thenReturn(Flux.just(temperature));
-        VirtualTimeScheduler scheduler = VirtualTimeScheduler.getOrSet();
+
         Long waitFor = temperature.interval();
 
         // when
         simulator.startGenerateValues();
-        scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
         verify(datPublisher).publish(eventArgumentCaptor.capture());
@@ -167,12 +174,12 @@ class SensorDataSimulatorTest extends BaseTest {
                 .build();
         Flux<SensorDescription> fux = Flux.just(gpio);
         when(storage.getAll()).thenReturn(fux);
-        VirtualTimeScheduler scheduler = VirtualTimeScheduler.getOrSet();
+
         Long waitFor = gpio.interval();
 
         // when
         simulator.startGenerateValues();
-        scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
         verify(datPublisher).publish(eventArgumentCaptor.capture());
@@ -194,12 +201,12 @@ class SensorDataSimulatorTest extends BaseTest {
                 .build();
         Flux<SensorDescription> fux = Flux.just(gpio);
         when(storage.getAll()).thenReturn(fux);
-        VirtualTimeScheduler scheduler = VirtualTimeScheduler.getOrSet();
+
         Long waitFor = gpio.interval();
 
         // when
         simulator.startGenerateValues();
-        scheduler.advanceTimeBy(Duration.ofMillis(waitFor));
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
 
         // then
         verify(datPublisher).publish(eventArgumentCaptor.capture());
