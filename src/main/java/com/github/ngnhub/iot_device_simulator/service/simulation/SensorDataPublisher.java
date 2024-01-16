@@ -14,11 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class SensorDataPublisher {
 
-    private final ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageQueues;
+    private final ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageListeners;
 
     public void publish(SensorData data) {
         var topic = data.getTopic();
-        topicToMessageQueues.computeIfPresent(topic, (key, consumers) -> fanOut(data, consumers));
+        topicToMessageListeners.computeIfPresent(topic, (key, consumers) -> fanOut(data, consumers));
     }
 
     private Map<String, SensorDataListener> fanOut(SensorData data, Map<String, SensorDataListener> consumers) {
@@ -38,7 +38,7 @@ public class SensorDataPublisher {
     }
 
     private void addNewConsumer(String topic, String id, SensorDataListener consumer) {
-        topicToMessageQueues.compute(topic, (key, queues) -> {
+        topicToMessageListeners.compute(topic, (key, queues) -> {
             if (queues == null) {
                 queues = new HashMap<>();
             }
@@ -48,7 +48,7 @@ public class SensorDataPublisher {
     }
 
     public void unsubscribe(String topic, String id) {
-        topicToMessageQueues.computeIfPresent(topic, (ignore, val) -> {
+        topicToMessageListeners.computeIfPresent(topic, (ignore, val) -> {
             val.remove(id);
             return val;
         });
