@@ -1,11 +1,13 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
-import com.github.ngnhub.iot_device_simulator.model.SensorData;
+import com.github.ngnhub.iot_device_simulator.UUIDVerifier;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Sinks;
-import reactor.test.StepVerifier;
+import org.mockito.Spy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,60 +17,57 @@ import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFacto
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+@Slf4j
 class SensorDataPublisherTest extends BaseTest {
 
-    private ConcurrentHashMap<String, Map<String, Sinks.Many<SensorData>>> topicToMessageQueues;
+    @Spy
+    private ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageQueues = new ConcurrentHashMap<>();
     private SensorDataPublisher publisher;
 
     @BeforeEach
     void setUp() {
-        topicToMessageQueues = new ConcurrentHashMap<>();
         publisher = new SensorDataPublisher(topicToMessageQueues);
     }
 
     @Test
-    void shouldFillAllSinks() {
+    void shouldSendDataToAllConsumers() {
         // given
         var topic = "topic";
         var data = getSensorData(topic, "on");
-        Map<String, Sinks.Many<SensorData>> queues = new HashMap<>();
+        Map<String, SensorDataListener> queues = new HashMap<>();
         var key1 = "key1";
         var key2 = "key2";
-        Sinks.Many<SensorData> sink1 = Sinks.many().unicast().onBackpressureBuffer();
-        Sinks.Many<SensorData> sink2 = Sinks.many().unicast().onBackpressureBuffer();
-        queues.put(key1, sink1);
-        queues.put(key2, sink2);
+        SensorDataListener consumer1 = spy(new TestSensorDataListener());
+        SensorDataListener consumer2 = spy(new TestSensorDataListener());
+        queues.put(key1, consumer1);
+        queues.put(key2, consumer2);
         topicToMessageQueues.put(topic, queues);
 
         // when
         publisher.publish(data);
-        sink1.tryEmitComplete();
-        sink2.tryEmitComplete();
 
         // then
-        StepVerifier.create(sink1.asFlux())
-                .expectNext(data)
-                .verifyComplete();
-        StepVerifier.create(sink2.asFlux())
-                .expectNext(data)
-                .verifyComplete();
+        verify(consumer1, times(1)).onData(data);
+        verify(consumer2, times(1)).onData(data);
     }
 
     @Test
-    void shouldAddNewSinkToMessageQueues() {
+    void shouldAddNewMapToTopic() {
         // given
         var topic = "topic";
+        SensorDataListener consumer = spy(new TestSensorDataListener());
 
         // when
-        var key = publisher.subscribe(topic);
+        var key = publisher.subscribe(topic, consumer);
 
         // then
-        assertNotNull(key.subscriberId());
-        assertNotNull(key.sink());
-        assertEquals(topicToMessageQueues.get(topic).get(key.subscriberId()), key.sink());
+        assertTrue(UUIDVerifier.isUUID(key));
+        assertEquals(topicToMessageQueues.get(topic).get(key), consumer);
     }
 
     @Test
@@ -76,8 +75,9 @@ class SensorDataPublisherTest extends BaseTest {
         // given
         var topic = "topic";
         var subscriberId = "id";
-        Map<String, Sinks.Many<SensorData>> map = new HashMap<>();
-        map.put(subscriberId, Sinks.many().unicast().onBackpressureBuffer());
+        SensorDataListener consumer = spy(new TestSensorDataListener());
+        Map<String, SensorDataListener> map = new HashMap<>();
+        map.put(subscriberId, consumer);
         topicToMessageQueues.put(topic, map);
         assertTrue(topicToMessageQueues.get(topic).containsKey(subscriberId));
 
@@ -93,26 +93,27 @@ class SensorDataPublisherTest extends BaseTest {
         // given
         var topic = "topic";
         var data = getSensorData(topic, "on");
+        SensorDataListener consumer = spy(new TestSensorDataListener());
 
         // when
-        var key = publisher.subscribe(topic);
+        var key = publisher.subscribe(topic, consumer);
         // then
         assertTrue(topicToMessageQueues.containsKey(topic));
-        assertTrue(topicToMessageQueues.get(topic).containsKey(key.subscriberId()));
+        assertTrue(topicToMessageQueues.get(topic).containsKey(key));
         assertDoesNotThrow(() -> publisher.publish(data));
 
         // when
-        publisher.unsubscribe(topic, key.subscriberId());
+        publisher.unsubscribe(topic, key);
         // then
         assertTrue(topicToMessageQueues.containsKey(topic));
-        assertFalse(topicToMessageQueues.get(topic).containsKey(key.subscriberId()));
+        assertFalse(topicToMessageQueues.get(topic).containsKey(key));
         assertDoesNotThrow(() -> publisher.publish(data));
 
         // when
-        key = publisher.subscribe(topic);
+        key = publisher.subscribe(topic, consumer);
         // then
         assertTrue(topicToMessageQueues.containsKey(topic));
-        assertTrue(topicToMessageQueues.get(topic).containsKey(key.subscriberId()));
+        assertTrue(topicToMessageQueues.get(topic).containsKey(key));
         assertDoesNotThrow(() -> publisher.publish(data));
     }
 }

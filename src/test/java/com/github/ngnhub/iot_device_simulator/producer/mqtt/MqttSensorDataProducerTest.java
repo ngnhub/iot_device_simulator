@@ -3,7 +3,7 @@ package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.config.MqttProps;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
-import com.github.ngnhub.iot_device_simulator.service.SensorDescriptionStorage;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.BeforeEach;

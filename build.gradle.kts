@@ -45,8 +45,6 @@ tasks.withType<Test> {
     tasks.named<Test>("test") {
         useJUnitPlatform()
 
-        maxHeapSize = "512M"
-
         testLogging {
             events("passed", "failed")
         }

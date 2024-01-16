@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.service;
+package com.github.ngnhub.iot_device_simulator.service.simulation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

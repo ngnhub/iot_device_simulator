@@ -22,7 +22,7 @@ public class TestSensorDescriptionFactory {
         return getSensorDescription(1);
     }
 
-    private static SensorDescription getSensorDescription(int index) {
+    private synchronized static SensorDescription getSensorDescription(int index) {
         try {
             File file = ResourceUtils.getFile("classpath:test_sensors.json");
             var mapper = new ObjectMapper();

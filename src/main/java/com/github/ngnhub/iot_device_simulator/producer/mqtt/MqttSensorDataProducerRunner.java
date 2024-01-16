@@ -12,9 +12,11 @@ import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQTT_LOG_TAG;
+import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_CLOSED;
 import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST;
 
 @Slf4j
@@ -22,6 +24,11 @@ import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTIO
 @Component
 @RequiredArgsConstructor
 public class MqttSensorDataProducerRunner {
+
+    private static final Set<Integer> RETRIABLE_REASONS = Set.of(
+            Short.valueOf(REASON_CODE_CONNECTION_LOST).intValue(),
+            Short.valueOf(REASON_CODE_CLIENT_CLOSED).intValue()
+    );
 
     private final MqttSensorDataProducer publisher;
     private final MqttConnectOptions options;
@@ -41,7 +48,7 @@ public class MqttSensorDataProducerRunner {
 
     private void handleError(Throwable err) {
         log.error("{} Error occurred while publishing mqtt messages: {}", MQTT_LOG_TAG, err.getMessage());
-        if (err instanceof MqttException && REASON_CODE_CONNECTION_LOST == ((MqttException) err).getReasonCode()) {
+        if (err instanceof MqttException && RETRIABLE_REASONS.contains(((MqttException) err).getReasonCode())) {
             log.info("{} Try to revive mqtt connection...", MQTT_LOG_TAG);
             scheduleRetry();
         }

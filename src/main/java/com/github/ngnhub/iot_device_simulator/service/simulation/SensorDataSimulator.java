@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.service;
+package com.github.ngnhub.iot_device_simulator.service.simulation;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
@@ -100,6 +100,7 @@ public class SensorDataSimulator {
                 .sensorData("Error {" + exc.getMessage() + "}")
                 .time(LocalDateTime.now())
                 .qos(description.qos())
+                .errored(true)
                 .build();
     }
 }

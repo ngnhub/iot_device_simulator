@@ -1,7 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.config;
 
-import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import reactor.core.publisher.Sinks;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SensorDataPublisherConfig {
 
     @Bean
-    public ConcurrentHashMap<String, Map<String, Sinks.Many<SensorData>>> topicToMessageQueues() {
+    public ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageQueues() {
         return new ConcurrentHashMap<>();
     }
 }

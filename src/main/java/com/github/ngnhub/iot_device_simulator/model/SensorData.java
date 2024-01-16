@@ -16,4 +16,5 @@ public class SensorData {
     private LocalDateTime time;
     @Nullable
     private Integer qos;
+    private boolean errored;
 }
