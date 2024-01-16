@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.service;
+package com.github.ngnhub.iot_device_simulator.service.simulation;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,7 +32,6 @@ public class SensorDataPublisher {
         return id;
     }
 
-    // TODO: 15.01.2024 https://projectreactor.io/docs/core/release/reference/#producing.create
     private void addNewConsumer(String topic, String id, DataConsumer consumer) {
         topicToMessageQueues.compute(topic, (key, queues) -> {
             if (queues == null) {
@@ -50,8 +48,6 @@ public class SensorDataPublisher {
             return val;
         });
     }
-
-    public record SinkKey(String subscriberId, Queue<SensorData> sink) {}
 
     public interface DataConsumer {
         void consume(SensorData data);

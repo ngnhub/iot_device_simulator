@@ -1,6 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.config;
 
-import com.github.ngnhub.iot_device_simulator.service.SensorDataPublisher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -3,7 +3,7 @@ package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 import com.github.ngnhub.iot_device_simulator.config.MqttProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
-import com.github.ngnhub.iot_device_simulator.service.SensorDescriptionStorage;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

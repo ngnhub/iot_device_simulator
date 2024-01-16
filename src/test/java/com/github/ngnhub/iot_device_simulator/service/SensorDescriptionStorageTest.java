@@ -1,6 +1,7 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
