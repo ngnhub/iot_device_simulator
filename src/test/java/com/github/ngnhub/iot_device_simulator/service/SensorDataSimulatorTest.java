@@ -191,30 +191,4 @@ class SensorDataSimulatorTest extends BaseTest {
                 gpioCaptured.getSensorData()
         );
     }
-
-    @Test
-    void shouldPGenerateErrorMessageWrongSensorValueType() {
-        // given
-        SensorDescription gpio = gpio()
-                .toBuilder()
-                .type("Float")
-                .build();
-        Flux<SensorDescription> fux = Flux.just(gpio);
-        when(storage.getAll()).thenReturn(fux);
-
-        Long waitFor = gpio.interval();
-
-        // when
-        simulator.startGenerateValues();
-        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
-
-        // then
-        verify(datPublisher).publish(eventArgumentCaptor.capture());
-        SensorData gpioCaptured = eventArgumentCaptor.getValue();
-        assertEquals(gpio.topic(), gpioCaptured.getTopic());
-        assertEquals(
-                "Error {Unsupported type: " + gpio.type() + "}",
-                gpioCaptured.getSensorData()
-        );
-    }
 }

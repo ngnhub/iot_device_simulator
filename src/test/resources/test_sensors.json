@@ -1,13 +1,13 @@
 [
   {
     "topic": "gpio",
-    "type": "String",
+    "type": "STRING",
     "intervalInMillis": 90,
     "possibleValues": ["1", "0"]
   },
   {
     "topic": "temperature",
-    "type": "Double",
+    "type": "DOUBLE",
     "min": -50,
     "max": 100,
     "qos": 1,

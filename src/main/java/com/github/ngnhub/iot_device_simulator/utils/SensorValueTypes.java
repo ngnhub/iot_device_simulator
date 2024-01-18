@@ -1,11 +1,16 @@
 package com.github.ngnhub.iot_device_simulator.utils;
 
-import lombok.experimental.UtilityClass;
+import lombok.Getter;
 
-// TODO: 10.01.2024 enum
-@UtilityClass
-public class SensorValueTypes {
+public enum SensorValueTypes {
 
-    public static final String DOUBLE = "Double";
-    public static final String STRING = "String";
+    DOUBLE(Double.class.getSimpleName()),
+    STRING(String.class.getSimpleName());
+
+    @Getter
+    private final String typeSimpleClassName;
+
+    SensorValueTypes(String typeSimpleClassName) {
+        this.typeSimpleClassName = typeSimpleClassName;
+    }
 }

@@ -23,7 +23,7 @@ public class SensorDescriptionValidator {
     }
 
     private void validateStringHasPossibleValues(SensorDescription description) {
-        if (STRING.equals(description.type()) && CollectionUtils.isEmpty(description.possibleValues())) {
+        if (STRING == description.type() && CollectionUtils.isEmpty(description.possibleValues())) {
             throw new ConstraintViolationException(
                     "Possible values can't be empty for the string type. Topic: " + description.topic(), null);
         }
@@ -36,7 +36,7 @@ public class SensorDescriptionValidator {
         }
         values.forEach(val -> {
             var possibleValueType = val.getClass().getSimpleName();
-            if (!description.type().equals(possibleValueType)) {
+            if (!description.type().getTypeSimpleClassName().equals(possibleValueType)) {
                 throw new ConstraintViolationException(
                         "Possible values have invalid type. Topic: " + description.topic(), null);
             }
