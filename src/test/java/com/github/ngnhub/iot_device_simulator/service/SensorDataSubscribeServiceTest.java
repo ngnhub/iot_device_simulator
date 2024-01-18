@@ -1,5 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
+import com.github.ngnhub.iot_device_simulator.config.InternalProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
@@ -28,7 +29,12 @@ class SensorDataSubscribeServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new SensorDataSubscribeService(publisher);
+        var subscriber = new InternalProps.Subscriber();
+        subscriber.setRetryAttempts(2);
+        subscriber.setRetryDelayMillis(1000L);
+        InternalProps internalProps = new InternalProps();
+        internalProps.setSubscriber(subscriber);
+        service = new SensorDataSubscribeService(publisher, internalProps);
     }
 
     @Test

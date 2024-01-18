@@ -21,6 +21,9 @@ import java.util.UUID;
 
 import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQTT_LOG_TAG;
 
+/**
+ * to read locally mosquitto_sub -h localhost -p 1883 -t +/gpio -u admin -P admin
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
