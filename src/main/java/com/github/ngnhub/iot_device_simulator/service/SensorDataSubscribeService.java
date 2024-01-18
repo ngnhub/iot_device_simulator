@@ -1,5 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.service;
 
+import com.github.ngnhub.iot_device_simulator.config.InternalProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
@@ -21,10 +22,9 @@ import java.time.Duration;
 public class SensorDataSubscribeService {
 
     private static final String LOG_TAG = "[SUBSCRIPTION]";
-    private static final long RETRY_ATTEMPTS = 2L; // TODO: 13.01.2024 to props
-    private static final long RETRY_DELAY_MILLIS = 1000L;// TODO: 13.01.2024 to props
 
     private final SensorDataPublisher publisher;
+    private final InternalProps internalProps;
 
     public Flux<SensorData> subscribeOn(String topic) {
         return consumeData(topic)
@@ -46,11 +46,14 @@ public class SensorDataSubscribeService {
         return id;
     }
 
-    private static RetryBackoffSpec getRetrySpec() {
-        return Retry.fixedDelay(RETRY_ATTEMPTS, Duration.ofMillis(RETRY_DELAY_MILLIS))
+    private RetryBackoffSpec getRetrySpec() {
+        var subscriber = internalProps.getSubscriber();
+        int retryAttempts = subscriber.getRetryAttempts();
+        long delay = subscriber.getRetryDelayMillis();
+        return Retry.fixedDelay(retryAttempts, Duration.ofMillis(delay))
                 .filter(Exceptions::isOverflow)
                 .onRetryExhaustedThrow((ignore1, ignore2) -> Exceptions.failWithOverflow(
-                        "Subscription on topic failed after " + RETRY_ATTEMPTS
+                        "Subscription on topic failed after " + retryAttempts
                                 + " retries. Consumer processes data too slowly"));
     }
 

@@ -21,13 +21,14 @@ import java.util.UUID;
 
 import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQTT_LOG_TAG;
 
+/**
+ * to read locally mosquitto_sub -h localhost -p 1883 -t +/gpio -u admin -P admin
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnBean(MqttClient.class)
 public class MqttSensorDataProducer {
-
-    private static final int DEFAULT_QOS = 2; // TODO: 15.01.2024 props
 
     private final SensorDataSubscribeService sensorDataSubscribeService;
     private final SensorDescriptionStorage storage;
@@ -58,7 +59,7 @@ public class MqttSensorDataProducer {
         Mono<Void> mono = Mono.fromCallable(() -> {
             var topic = generateTopic(data.getTopic());
             var mqttMessage = new MqttMessage();
-            mqttMessage.setQos(data.getQos() == null ? DEFAULT_QOS : data.getQos());
+            mqttMessage.setQos(data.getQos() == null ? props.getQos() : data.getQos());
             byte[] payload = convertValue(data.getSensorData());
             mqttMessage.setPayload(payload);
             sendMessage(topic, mqttMessage);

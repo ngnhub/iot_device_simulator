@@ -3,8 +3,14 @@ spring:
     server:
       port: 7071
 sensor-descriptor-path: 'classpath:test_sensors.json'
+
 mqtt:
   enabled: false
+
+internal:
+  subscriber:
+    retry-attempts: 1
+    retry-delay-millis: 100
 
 logging:
   level:
