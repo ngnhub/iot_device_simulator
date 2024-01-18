@@ -9,9 +9,9 @@ import org.springframework.lang.Nullable;
 
 import java.util.List;
 
-// TODO: 10.01.2024 unit of measure
 public record SensorDescription(String topic,
                                 SensorValueTypes type,
+                                @Nullable String unitOfMeasure,
                                 @Nullable Double min,
                                 @Nullable Double max,
                                 @Nullable List<Object> possibleValues,

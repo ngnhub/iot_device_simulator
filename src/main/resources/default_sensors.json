@@ -10,6 +10,7 @@
     "type": "DOUBLE",
     "min": -50,
     "max": 100,
+    "unitOfMeasure": "C",
     "intervalInMillis": 1000
   },
   {

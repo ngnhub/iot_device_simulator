@@ -79,7 +79,11 @@ class SensorDataSimulatorTest extends BaseTest {
 
         SensorData temperatureCaptured = allValues.get(1);
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
-        double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
+
+        String capturedTemperatureData = temperatureCaptured.getSensorData();
+        assertTrue(capturedTemperatureData.endsWith(temperature.unitOfMeasure()));
+        capturedTemperatureData = capturedTemperatureData.replace("C", "");
+        double sensorData = Double.parseDouble(capturedTemperatureData);
         assertNotNull(temperature.min());
         assertNotNull(temperature.max());
         boolean inRange = temperature.min() <= sensorData && sensorData <= temperature.max();
@@ -105,7 +109,11 @@ class SensorDataSimulatorTest extends BaseTest {
         verify(datPublisher).publish(eventArgumentCaptor.capture());
         SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
-        double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
+
+        String capturedTemperatureData = temperatureCaptured.getSensorData();
+        assertTrue(capturedTemperatureData.endsWith(temperature.unitOfMeasure()));
+        capturedTemperatureData = capturedTemperatureData.replace("C", "");
+        double sensorData = Double.parseDouble(capturedTemperatureData);
         assertNull(temperature.min());
         assertNotNull(temperature.max());
         boolean inRange = Double.MIN_VALUE <= sensorData && sensorData <= temperature.max();
@@ -131,7 +139,11 @@ class SensorDataSimulatorTest extends BaseTest {
         verify(datPublisher).publish(eventArgumentCaptor.capture());
         SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
-        double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
+
+        String capturedTemperatureData = temperatureCaptured.getSensorData();
+        assertTrue(capturedTemperatureData.endsWith(temperature.unitOfMeasure()));
+        capturedTemperatureData = capturedTemperatureData.replace("C", "");
+        double sensorData = Double.parseDouble(capturedTemperatureData);
         assertNotNull(temperature.min());
         assertNull(temperature.max());
         boolean inRange = temperature.min() <= sensorData && sensorData <= Double.MAX_VALUE;
@@ -158,7 +170,11 @@ class SensorDataSimulatorTest extends BaseTest {
         verify(datPublisher).publish(eventArgumentCaptor.capture());
         SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
-        double sensorData = Double.parseDouble(temperatureCaptured.getSensorData());
+
+        String capturedTemperatureData = temperatureCaptured.getSensorData();
+        assertTrue(capturedTemperatureData.endsWith(temperature.unitOfMeasure()));
+        capturedTemperatureData = capturedTemperatureData.replace("C", "");
+        double sensorData = Double.parseDouble(capturedTemperatureData);
         assertNull(temperature.min());
         assertNull(temperature.max());
         boolean inRange = Double.MIN_VALUE <= sensorData && sensorData <= Double.MAX_VALUE;

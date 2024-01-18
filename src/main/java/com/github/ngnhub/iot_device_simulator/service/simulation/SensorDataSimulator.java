@@ -16,9 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.DOUBLE;
-import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.STRING;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -88,8 +85,9 @@ public class SensorDataSimulator {
     }
 
     private SensorData convertToSensorData(SensorDescription description, Object value) {
+        String unitOfMeasure = description.unitOfMeasure();
         return SensorData.builder().topic(description.topic())
-                .sensorData(value.toString())
+                .sensorData(value.toString() + (unitOfMeasure == null ? "" : unitOfMeasure))
                 .time(LocalDateTime.now())
                 .qos(description.qos())
                 .build();
