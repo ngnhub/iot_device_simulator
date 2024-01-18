@@ -31,6 +31,7 @@ public class SensorDataSimulator {
 
     public void startGenerateValues() {
         storage.getAll()
+                .filter(description -> !description.switcher())
                 .flatMap(description -> Flux
                         .interval(Duration.ofMillis(description.interval()))
                         .map(v -> tryGetRandomValue(description))
@@ -89,7 +90,6 @@ public class SensorDataSimulator {
         return SensorData.builder().topic(description.topic())
                 .sensorData(value.toString() + (unitOfMeasure == null ? "" : unitOfMeasure))
                 .time(LocalDateTime.now())
-                .qos(description.qos())
                 .build();
     }
 
@@ -97,7 +97,6 @@ public class SensorDataSimulator {
         return SensorData.builder().topic(description.topic())
                 .sensorData("Error {" + exc.getMessage() + "}")
                 .time(LocalDateTime.now())
-                .qos(description.qos())
                 .errored(true)
                 .build();
     }

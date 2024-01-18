@@ -4,6 +4,7 @@ import com.github.ngnhub.iot_device_simulator.config.MqttProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,20 +47,21 @@ public class MqttSensorDataProducer {
     }
 
     public Flux<Void> subscribeAndProduce() {
-        return storage.getAllTopics()
-                .flatMap(sensorDataSubscribeService::subscribeOn)
-                .flatMap(this::publish);
+        return storage.getAll()
+                .flatMap(description -> sensorDataSubscribeService
+                        .subscribeOn(description.topic())
+                        .flatMap(data -> publish(data, description.qos())));
     }
 
     public boolean isConnected() {
         return mqttClient.isConnected();
     }
 
-    private Mono<Void> publish(SensorData data) {
+    private Mono<Void> publish(SensorData data, @Nullable Integer qos) {
         Mono<Void> mono = Mono.fromCallable(() -> {
             var topic = generateTopic(data.getTopic());
             var mqttMessage = new MqttMessage();
-            mqttMessage.setQos(data.getQos() == null ? props.getQos() : data.getQos());
+            mqttMessage.setQos(qos == null ? props.getQos() : qos);
             byte[] payload = convertValue(data.getSensorData());
             mqttMessage.setPayload(payload);
             sendMessage(topic, mqttMessage);

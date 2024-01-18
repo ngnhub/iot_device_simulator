@@ -1,9 +1,9 @@
 [
   {
-    "topic": "gpio",
+    "topic": "gpio1",
     "type": "DOUBLE",
-    "intervalInMillis": 1000,
-    "possibleValues": [1.0, 0.0]
+    "possibleValues": [1.0, 0.0],
+    "switcher" : true
   },
   {
     "topic": "temperature",
@@ -14,11 +14,10 @@
     "intervalInMillis": 1000
   },
   {
-    "topic": "humidity",
+    "topic": "fan/state",
     "type": "DOUBLE",
-    "min": 0,
-    "max": 100,
-    "intervalInMillis": 10000
+    "possibleValues": ["on", "of"],
+    "switcher" : true
   },
   {
     "topic": "pressure",
@@ -40,12 +39,6 @@
     "min": 0,
     "max": 200,
     "intervalInMillis": 20000
-  },
-  {
-    "topic": "device_status",
-    "type": "STRING",
-    "possibleValues": ["on", "off", "standby"],
-    "intervalInMillis": 3000
   },
   {
     "topic": "gyroscope",

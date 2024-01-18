@@ -20,12 +20,12 @@ public class SensorDescriptionValidator {
         jakartaValidator.validate(description);
         validateStringHasPossibleValues(description);
         validatePossibleValuesMatchType(description);
+        validateSwitcherAndContainsInitValueAndPossibleValues(description);
     }
 
     private void validateStringHasPossibleValues(SensorDescription description) {
         if (STRING == description.type() && CollectionUtils.isEmpty(description.possibleValues())) {
-            throw new ConstraintViolationException(
-                    "Possible values can't be empty for the string type. Topic: " + description.topic(), null);
+            throwError("Possible values can't be empty for the string type. Topic: ", description.topic());
         }
     }
 
@@ -37,9 +37,26 @@ public class SensorDescriptionValidator {
         values.forEach(val -> {
             var possibleValueType = val.getClass().getSimpleName();
             if (!description.type().getTypeSimpleClassName().equals(possibleValueType)) {
-                throw new ConstraintViolationException(
-                        "Possible values have invalid type. Topic: " + description.topic(), null);
+                throwError("Possible values have invalid type. Topic: ", description.topic());
             }
         });
+    }
+
+    private void validateSwitcherAndContainsInitValueAndPossibleValues(SensorDescription description) {
+        if (description.switcher()) {
+            var initValue = description.initValue();
+            if (initValue == null) {
+                throwError("Init value must be provided for the switcher. Topic: ", description.topic());
+            }
+            var initValueTypeName = initValue.getClass().getSimpleName();
+            var sensorTypeName = description.type().getTypeSimpleClassName();
+            if (!initValueTypeName.equals(sensorTypeName)) {
+                throwError("Init value type is not matched to sensor type. Topic: ", description.topic());
+            }
+        }
+    }
+
+    private void throwError(String message, String topic) {
+        throw new ConstraintViolationException(message + topic, null);
     }
 }

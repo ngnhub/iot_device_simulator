@@ -16,7 +16,9 @@ public record SensorDescription(String topic,
                                 @Nullable Double max,
                                 @Nullable List<Object> possibleValues,
                                 @Nullable Integer qos,
-                                @NotNull @JsonProperty("intervalInMillis") Long interval) {
+                                @NotNull @JsonProperty("intervalInMillis") Long interval,
+                                boolean switcher,
+                                Object initValue) {
 
     @Builder(toBuilder = true)
     public SensorDescription {}
