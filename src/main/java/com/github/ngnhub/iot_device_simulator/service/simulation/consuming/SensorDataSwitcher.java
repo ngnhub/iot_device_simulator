@@ -25,8 +25,7 @@ public class SensorDataSwitcher {
 
     public Mono<SensorData> switchOn(Mono<ChangeDeviceValueRequest> request) {
         return request.flatMap(changeValue -> Mono.fromCallable(() -> switchAndGet(changeValue))
-                        .onErrorResume((err) -> computeError(changeValue, (Exception) err)))
-                .doOnNext(publisher::publish);
+                        .onErrorResume((err) -> computeError(changeValue, (Exception) err)));
     }
 
     private SensorData switchAndGet(ChangeDeviceValueRequest changeValue) {

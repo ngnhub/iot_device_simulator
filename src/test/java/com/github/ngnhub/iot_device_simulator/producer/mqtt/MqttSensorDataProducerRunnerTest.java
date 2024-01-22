@@ -1,6 +1,8 @@
 package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
+import com.github.ngnhub.iot_device_simulator.producer.MqttSensorDataConsumer;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.junit.jupiter.api.AfterAll;
@@ -27,14 +29,18 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
     private static final VirtualTimeScheduler SCHEDULER = VirtualTimeScheduler.getOrSet();
 
     @Mock
-    private MqttSensorDataProducer publisher;
+    private MqttSensorDataProducer producer;
+    @Mock
+    private MqttSensorDataConsumer consumer;
     @Mock
     private MqttConnectOptions options;
+    @Mock
+    private MqttClient client;
     private MqttSensorDataProducerRunner runner;
 
     @BeforeEach
     void setUp() {
-        runner = spy(new MqttSensorDataProducerRunner(publisher, options));
+        runner = spy(new MqttSensorDataProducerRunner(producer, consumer, options, client));
     }
 
     @AfterAll
@@ -46,27 +52,32 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
     void shouldCompleteSuccessfully() {
         // given
         Flux<Void> sentMessages = Flux.empty();
-        when(publisher.subscribeAndProduce()).thenReturn(sentMessages);
+        Flux<Void> subscriptions = Flux.empty();
+        when(producer.initProduce()).thenReturn(sentMessages);
+        when(consumer.initSubscriptionsOnSwitchableTopics()).thenReturn(subscriptions);
 
         // when
-        runner.runMqtt();
+        runner.init();
 
         // then
         StepVerifier.create(sentMessages).verifyComplete();
-        verify(publisher).subscribeAndProduce();
-        verify(publisher, never()).isConnected();
+        verify(producer).initProduce();
+        verify(consumer).initSubscriptionsOnSwitchableTopics();
+        verify(client, never()).isConnected();
     }
 
     @Test
     void shouldRetryTwice() {
         // given
+        Flux<Void> subscriptions = Flux.empty();
+        when(consumer.initSubscriptionsOnSwitchableTopics()).thenReturn(subscriptions);
         when(options.getMaxReconnectDelay()).thenReturn(1000);
         Flux<Void> firstError = Flux.error(new MqttException(REASON_CODE_CONNECTION_LOST));
         Flux<Void> success = Flux.empty();
-        when(publisher.subscribeAndProduce())
+        when(producer.initProduce())
                 .thenReturn(firstError)
                 .thenReturn(success);
-        when(publisher.isConnected())
+        when(client.isConnected())
                 .thenReturn(false)
                 .thenReturn(true);
 
@@ -74,7 +85,7 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
         doReturn(SCHEDULER).when(runner).singleThreadScheduler();
 
         // when
-        runner.runMqtt();
+        runner.init();
         long waitFor = 3000L;
         SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
 
@@ -82,22 +93,108 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
         StepVerifier.create(firstError).verifyError();
         StepVerifier.create(success).verifyComplete();
 
-        verify(publisher, times(2)).subscribeAndProduce();
-        verify(publisher, times(2)).isConnected();
+        verify(producer, times(2)).initProduce();
+        verify(client, times(2)).isConnected();
+    }
+
+    @Test
+    void shouldRetryTwiceForConsumer() {
+        // given
+        Flux<Void> sentMessage = Flux.empty();
+        when(producer.initProduce()).thenReturn(sentMessage);
+        when(options.getMaxReconnectDelay()).thenReturn(1000);
+        Flux<Void> firstError = Flux.error(new MqttException(REASON_CODE_CONNECTION_LOST));
+        Flux<Void> success = Flux.empty();
+        when(consumer.initSubscriptionsOnSwitchableTopics())
+                .thenReturn(firstError)
+                .thenReturn(success);
+        when(client.isConnected())
+                .thenReturn(false)
+                .thenReturn(true);
+
+        doReturn(SCHEDULER).when(runner).singleThreadScheduler();
+
+        // when
+        runner.init();
+        long waitFor = 3000L;
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
+
+        // then
+        StepVerifier.create(firstError).verifyError();
+        StepVerifier.create(success).verifyComplete();
+
+        verify(consumer, times(2)).initSubscriptionsOnSwitchableTopics();
+        verify(client, times(2)).isConnected();
+    }
+
+    @Test
+    void shouldRetryTwiceForBoth() {
+        // given
+        when(options.getMaxReconnectDelay()).thenReturn(1000);
+        Flux<Void> firstError = Flux.error(new MqttException(REASON_CODE_CONNECTION_LOST));
+        Flux<Void> firstErrorConsumer = Flux.error(new MqttException(REASON_CODE_CONNECTION_LOST));
+        Flux<Void> success = Flux.empty();
+        Flux<Void> successConsumer = Flux.empty();
+        when(producer.initProduce())
+                .thenReturn(firstError)
+                .thenReturn(success);
+        when(consumer.initSubscriptionsOnSwitchableTopics())
+                .thenReturn(firstErrorConsumer)
+                .thenReturn(successConsumer);
+        when(client.isConnected())
+                .thenReturn(false)
+                .thenReturn(false)
+                .thenReturn(true);
+
+        doReturn(SCHEDULER).when(runner).singleThreadScheduler();
+
+        // when
+        runner.init();
+        long waitFor = 3000L;
+        SCHEDULER.advanceTimeBy(Duration.ofMillis(waitFor));
+
+        // then
+        StepVerifier.create(firstError).verifyError();
+        StepVerifier.create(firstErrorConsumer).verifyError();
+        StepVerifier.create(success).verifyComplete();
+        StepVerifier.create(successConsumer).verifyComplete();
+
+        verify(consumer, times(2)).initSubscriptionsOnSwitchableTopics();
+        verify(producer, times(2)).initProduce();
+        verify(client, times(4)).isConnected();
     }
 
     @Test
     void shouldNotRetry() {
         // given
+        Flux<Void> subscriptions = Flux.empty();
+        when(consumer.initSubscriptionsOnSwitchableTopics()).thenReturn(subscriptions);
         Flux<Void> firstError = Flux.error(new RuntimeException());
-        when(publisher.subscribeAndProduce()).thenReturn(firstError);
+        when(producer.initProduce()).thenReturn(firstError);
 
         // when
-        runner.runMqtt();
+        runner.init();
 
         // then
         StepVerifier.create(firstError).verifyError();
-        verify(publisher).subscribeAndProduce();
-        verify(publisher, never()).isConnected();
+        verify(producer).initProduce();
+        verify(client, never()).isConnected();
+    }
+
+    @Test
+    void shouldNotRetryForConsumer() {
+        // given
+        Flux<Void> sentMessage = Flux.empty();
+        when(producer.initProduce()).thenReturn(sentMessage);
+        Flux<Void> firstError = Flux.error(new RuntimeException());
+        when(consumer.initSubscriptionsOnSwitchableTopics()).thenReturn(firstError);
+
+        // when
+        runner.init();
+
+        // then
+        StepVerifier.create(firstError).verifyError();
+        verify(consumer).initSubscriptionsOnSwitchableTopics();
+        verify(client, never()).isConnected();
     }
 }

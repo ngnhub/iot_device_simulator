@@ -19,7 +19,6 @@ import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFacto
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.gpio;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.temperature;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
@@ -71,7 +70,7 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(sensorDataSubscribeService.subscribeOn(temperatureTopic)).thenReturn(Flux.just(temperatureData));
 
         // when
-        Flux<Void> flux = producer.subscribeAndProduce().take(2);
+        Flux<Void> flux = producer.initProduce().take(2);
 
         // then
         StepVerifier.create(flux).verifyComplete();
@@ -101,7 +100,7 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
-        Flux<Void> flux = producer.subscribeAndProduce().take(1);
+        Flux<Void> flux = producer.initProduce().take(1);
 
         // then
         StepVerifier.create(flux).verifyComplete();
@@ -120,7 +119,7 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
-        Flux<Void> flux = producer.subscribeAndProduce().take(1);
+        Flux<Void> flux = producer.initProduce().take(1);
 
         // then
         StepVerifier.create(flux).verifyComplete();
@@ -142,23 +141,11 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
-        Flux<Void> flux = producer.subscribeAndProduce().take(1);
+        Flux<Void> flux = producer.initProduce().take(1);
 
         // then
         StepVerifier.create(flux).verifyComplete();
 
         verify(mqttClient).publish(matches("^" + basePath + "/" + UUID_PATTERN + "/gpio$"), any());
-    }
-
-    @Test
-    void shouldBeConnected() {
-        // given
-        when(mqttClient.isConnected()).thenReturn(true);
-
-        // when
-        boolean connected = producer.isConnected();
-
-        // then
-        assertTrue(connected);
     }
 }

@@ -2,15 +2,15 @@ package com.github.ngnhub.iot_device_simulator.producer;
 
 import com.github.ngnhub.iot_device_simulator.model.ChangeDeviceValueRequest;
 import com.github.ngnhub.iot_device_simulator.service.simulation.consuming.SensorDataSwitcher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Slf4j
@@ -19,20 +19,24 @@ public class MqttSensorDataConsumer {
 
     private final MqttClient client;
     private final SensorDataSwitcher switcher;
-    private final List<String> topicsOfSwitchableDevices;
+    private final Flux<String> topicsOfSwitchableDevices;
+    private final SensorDataPublisher publisher;
 
-    public void initSubscribe() throws MqttException {
-        for (String topicsOfSwitchableDevice : topicsOfSwitchableDevices) {
-            getSubscribe(topicsOfSwitchableDevice);
-        }
+    // TODO: 22.01.2024 test
+    public Flux<Void> initSubscriptionsOnSwitchableTopics() {
+        return topicsOfSwitchableDevices
+                .flatMap(topic -> Mono.fromCallable(() -> {
+                    subscribe(topic);
+                    return null;
+                }));
     }
 
-    private void getSubscribe(String switchableTopic) throws MqttException {
+    private void subscribe(String switchableTopic) throws MqttException {
         client.subscribe(
                 switchableTopic,
                 (topic, message) -> switcher
                         .switchOn(Mono.just(new ChangeDeviceValueRequest(topic, message)))
-                        .subscribe()
+                        .subscribe(publisher::publish)
         );
     }
 }

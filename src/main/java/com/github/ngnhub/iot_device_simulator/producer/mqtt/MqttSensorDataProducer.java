@@ -46,15 +46,11 @@ public class MqttSensorDataProducer {
         }
     }
 
-    public Flux<Void> subscribeAndProduce() {
+    public Flux<Void> initProduce() {
         return storage.getAll()
                 .flatMap(description -> sensorDataSubscribeService
                         .subscribeOn(description.topic())
                         .flatMap(data -> publish(data, description.qos())));
-    }
-
-    public boolean isConnected() {
-        return mqttClient.isConnected();
     }
 
     private Mono<Void> publish(SensorData data, @Nullable Integer qos) {

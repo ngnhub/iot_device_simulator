@@ -2,6 +2,7 @@ package com.github.ngnhub.iot_device_simulator.config;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
+import reactor.core.publisher.Flux;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,11 +41,9 @@ public class SensorDataSwitcherConfig {
     }
 
     @Bean
-    public List<String> topicsOfSwitchableDevices(SensorDescriptionStorage storage) {
+    public Flux<String> topicsOfSwitchableDevices(SensorDescriptionStorage storage) {
         return storage.getAll()
                 .filter(SensorDescription::switcher)
-                .map(SensorDescription::topic)
-                .collectList()
-                .block();
+                .map(SensorDescription::topic);
     }
 }

@@ -1,9 +1,9 @@
 package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 
-import com.github.ngnhub.iot_device_simulator.error.MqttWrapperException;
 import com.github.ngnhub.iot_device_simulator.producer.MqttSensorDataConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import reactor.core.scheduler.Scheduler;
@@ -35,6 +35,7 @@ public class MqttSensorDataProducerRunner {
     private final MqttSensorDataProducer producer;
     private final MqttSensorDataConsumer consumer;
     private final MqttConnectOptions options;
+    private final MqttClient client;
 
     @Lookup
     public Scheduler singleThreadScheduler() {
@@ -42,23 +43,30 @@ public class MqttSensorDataProducerRunner {
     }
 
     @EventListener(ApplicationContextEvent.class)
-    public void runMqtt() {
-        producer.subscribeAndProduce()
-                .doOnError(this::handleError)
-                .onErrorComplete()
-                .subscribe();
-        try {
-            consumer.initSubscribe();
-        } catch (MqttException e) {
-            throw new MqttWrapperException("Exception occurred during subscribing", e);
-        }
+    public void init() {
+        runMqttProducer();
+        runMqttConsumer();
     }
 
-    private void handleError(Throwable err) {
+    private void runMqttProducer() {
+        producer.initProduce()
+                .doOnError(err -> handleError(err, this::runMqttProducer))
+                .onErrorComplete()
+                .subscribe();
+    }
+
+    private void runMqttConsumer() {
+        consumer.initSubscriptionsOnSwitchableTopics()
+                .doOnError(err -> handleError(err, this::runMqttConsumer))
+                .onErrorComplete()
+                .subscribe();
+    }
+
+    private void handleError(Throwable err, Runnable task) {
         log.error("{} Error occurred while publishing mqtt messages: {}", MQTT_LOG_TAG, err.getMessage());
         if (err instanceof MqttException && RETRIABLE_REASONS.contains(((MqttException) err).getReasonCode())) {
             log.info("{} Try to revive mqtt connection...", MQTT_LOG_TAG);
-            scheduleRetry();
+            scheduleRetry(task);
         }
     }
 
@@ -67,18 +75,18 @@ public class MqttSensorDataProducerRunner {
      * It divides the maximum reconnection delay by 2 to minimize inaccuracy when the retry is scheduled just before
      * the reconnection.
      */
-    private void scheduleRetry() {
+    private void scheduleRetry(Runnable task) {
         int reconnectionDelay = options.getMaxReconnectDelay() / 2;
-        singleThreadScheduler().schedule(retryTask(), reconnectionDelay, TimeUnit.MILLISECONDS);
+        singleThreadScheduler().schedule(retryTask(task), reconnectionDelay, TimeUnit.MILLISECONDS);
     }
 
-    private Runnable retryTask() {
+    private Runnable retryTask(Runnable task) {
         return () -> {
-            if (producer.isConnected()) {
-                runMqtt();
+            if (client.isConnected()) {
+                task.run();
                 log.info("{} Mqtt publishing revived", MQTT_LOG_TAG);
             } else {
-                scheduleRetry();
+                scheduleRetry(task);
                 log.info("{} Mqtt client is still disconnected...", MQTT_LOG_TAG);
             }
         };
