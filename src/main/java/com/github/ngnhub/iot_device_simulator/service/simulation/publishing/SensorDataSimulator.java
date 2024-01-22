@@ -19,6 +19,7 @@ import java.util.Random;
 
 import static com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory.create;
 
+// TODO: 22.01.2024 round double
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class SensorDataSimulator {
 
     public void startGenerateValues() {
         storage.getAll()
-                .filter(description -> !description.switcher())
+                .filter(description -> description.switcher() == null)
                 .flatMap(description -> Flux
                         .interval(Duration.ofMillis(description.interval()))
                         .map(v -> tryGetRandomValue(description))

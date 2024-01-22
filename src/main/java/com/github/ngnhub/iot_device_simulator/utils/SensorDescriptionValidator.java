@@ -18,9 +18,11 @@ public class SensorDescriptionValidator {
 
     public void validate(SensorDescription description) {
         jakartaValidator.validate(description);
+        if (description.switcher() != null) {
+            jakartaValidator.validate(description.switcher());
+        }
         validateStringHasPossibleValues(description);
         validatePossibleValuesMatchType(description);
-        validateSwitcherAndContainsInitValueAndPossibleValues(description);
         validateNotSwitcherAndHastInterval(description);
     }
 
@@ -42,21 +44,8 @@ public class SensorDescriptionValidator {
         });
     }
 
-    private void validateSwitcherAndContainsInitValueAndPossibleValues(SensorDescription description) {
-        if (description.switcher()) {
-            var initValue = description.initValue();
-            if (initValue == null) {
-                throwError("Init value must be provided for the switcher. Topic: ", description.topic());
-            }
-            var aClass = description.type().getAClass();
-            if (!aClass.isInstance(initValue)) {
-                throwError("Init value type is not matched to sensor type. Topic: ", description.topic());
-            }
-        }
-    }
-
     private void validateNotSwitcherAndHastInterval(SensorDescription description) {
-        if (!description.switcher() && description.interval() == null) {
+        if (description.switcher() == null && description.interval() == null) {
             throwError("Interval must not be null if not switchable. Topic: ", description.topic());
         }
     }

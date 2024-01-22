@@ -19,7 +19,7 @@ public class SensorDataFactory {
 
     public static SensorData create(String topic, Exception exc) {
         return SensorData.builder().topic(topic)
-                .value("Error {" + exc.getMessage() + "}")
+                .value("Error occurred during the data processing { " + exc.getMessage() + " }")
                 .time(LocalDateTime.now())
                 .errored(true)
                 .build();

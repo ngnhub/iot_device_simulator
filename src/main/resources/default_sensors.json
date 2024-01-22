@@ -3,8 +3,7 @@
     "topic": "gpio1",
     "type": "DOUBLE",
     "possibleValues": [1.0, 0.0],
-    "switcher": true,
-    "initValue": 0.0
+    "switcher": "gpio1/state"
   },
   {
     "topic": "temperature",
@@ -15,11 +14,10 @@
     "intervalInMillis": 1000
   },
   {
-    "topic": "fan/state",
+    "topic": "fan",
     "type": "STRING",
     "possibleValues": ["on", "of"],
-    "switcher": true,
-    "initValue": "off"
+    "switcher": "fan/state"
   },
   {
     "topic": "pressure",

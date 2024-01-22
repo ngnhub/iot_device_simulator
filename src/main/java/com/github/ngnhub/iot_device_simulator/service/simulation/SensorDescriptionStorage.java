@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,7 @@ public class SensorDescriptionStorage {
 
     private final Map<String, SensorDescription> descriptions;
 
+    // TODO: 22.01.2024 in config
     public SensorDescriptionStorage(@Value("${sensor-descriptor-path}") String descriptorPath,
                                     SensorDescriptionValidator validator) throws IOException {
         var file = ResourceUtils.getFile(descriptorPath);
@@ -37,20 +37,8 @@ public class SensorDescriptionStorage {
         return Flux.fromIterable(descriptions.values());
     }
 
-
     public Flux<SensorDescription> getOnlySwitchable() {
         return getAll()
-                .filter(SensorDescription::switcher);
-    }
-
-    /**
-     * No need to utilize mono here, just for simulating kind of blocking storage
-     */
-    public Mono<SensorDescription> getBy(String name) {
-        SensorDescription description = descriptions.get(name);
-        if (description == null) {
-            throw new IllegalArgumentException("Sensor is not found: " + name);
-        }
-        return Mono.just(description);
+                .filter(description -> description.switcher() != null);
     }
 }

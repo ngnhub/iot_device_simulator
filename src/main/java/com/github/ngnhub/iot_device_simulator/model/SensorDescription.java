@@ -8,16 +8,15 @@ import org.springframework.lang.Nullable;
 
 import java.util.List;
 
-public record SensorDescription(String topic,
+public record SensorDescription(java.lang.String topic,
                                 SensorValueType type,
-                                @Nullable String unitOfMeasure,
+                                @Nullable java.lang.String unitOfMeasure,
                                 @Nullable Double min,
                                 @Nullable Double max,
                                 @Nullable List<Object> possibleValues,
                                 @Nullable Integer qos,
                                 @JsonProperty("intervalInMillis") Long interval,
-                                boolean switcher,
-                                Object initValue) {
+                                @Nullable String switcher) {
 
     @Builder(toBuilder = true)
     public SensorDescription {}

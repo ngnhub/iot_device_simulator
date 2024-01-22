@@ -66,8 +66,7 @@ public class SensorDataSubscribeService {
 
         @Override
         public void onError(SensorData data) {
-            log.error(data.toString());
-            dataFluxSink.complete();
+            log.error("Errored data consumed: {}", data.toString());
         }
     }
 }
