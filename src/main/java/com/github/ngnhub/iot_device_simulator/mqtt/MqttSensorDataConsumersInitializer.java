@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 
+// FIXME: 22.01.2024 fully rework should have separate topics for switcher
 @Service
 @Slf4j
 @RequiredArgsConstructor

@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.fan;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.gpio;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.temperature;
-import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.DOUBLE;
+import static com.github.ngnhub.iot_device_simulator.utils.SensorValueType.DOUBLE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

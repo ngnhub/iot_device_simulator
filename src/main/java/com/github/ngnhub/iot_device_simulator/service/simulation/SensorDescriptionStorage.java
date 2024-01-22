@@ -37,6 +37,12 @@ public class SensorDescriptionStorage {
         return Flux.fromIterable(descriptions.values());
     }
 
+
+    public Flux<SensorDescription> getOnlySwitchable() {
+        return getAll()
+                .filter(SensorDescription::switcher);
+    }
+
     /**
      * No need to utilize mono here, just for simulating kind of blocking storage
      */

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.STRING;
+import static com.github.ngnhub.iot_device_simulator.utils.SensorValueType.STRING;
 
 @Component
 @RequiredArgsConstructor
@@ -36,8 +36,7 @@ public class SensorDescriptionValidator {
             return;
         }
         values.forEach(val -> {
-            var possibleValueType = val.getClass().getSimpleName();
-            if (!description.type().getTypeSimpleClassName().equals(possibleValueType)) {
+            if (!description.type().getAClass().isInstance(val)) {
                 throwError("Possible values have invalid type. Topic: ", description.topic());
             }
         });
@@ -49,9 +48,8 @@ public class SensorDescriptionValidator {
             if (initValue == null) {
                 throwError("Init value must be provided for the switcher. Topic: ", description.topic());
             }
-            var initValueTypeName = initValue.getClass().getSimpleName();
-            var sensorTypeName = description.type().getTypeSimpleClassName();
-            if (!initValueTypeName.equals(sensorTypeName)) {
+            var aClass = description.type().getAClass();
+            if (!aClass.isInstance(initValue)) {
                 throwError("Init value type is not matched to sensor type. Topic: ", description.topic());
             }
         }
