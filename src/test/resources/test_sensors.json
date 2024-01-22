@@ -18,7 +18,7 @@
     "topic": "fan",
     "type": "DOUBLE",
     "switcher": true,
-    "possibleValues": ["1", "0"],
-    "initValue" : "0"
+    "possibleValues": [1.0, 0.0],
+    "initValue" : 0.0
   }
 ]

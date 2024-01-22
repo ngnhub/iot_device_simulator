@@ -2,6 +2,7 @@ package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.config.MqttProps;
+import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -59,13 +60,13 @@ class MqttSensorDataProducerTest extends BaseTest {
     void shouldSendTwoMessages() throws Exception {
         // given
         props.setEnableTopicUniqueIds(false);
-        var gpioTopic = gpio().topic();
-        var temperatureTopic = temperature().topic();
-        when(storage.getAllTopics()).thenReturn(Flux.just(gpioTopic, temperatureTopic));
+        SensorDescription gpio = gpio();
+        var gpioTopic = gpio.topic();
+        SensorDescription temperature = temperature();
+        var temperatureTopic = temperature.topic();
+        when(storage.getAll()).thenReturn(Flux.just(gpio, temperature));
         var gpioData = getSensorData(gpioTopic, "1");
         var temperatureData = getSensorData(temperatureTopic, "15");
-        gpioData.setQos(null);
-        temperatureData.setQos(1);
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
         when(sensorDataSubscribeService.subscribeOn(temperatureTopic)).thenReturn(Flux.just(temperatureData));
 

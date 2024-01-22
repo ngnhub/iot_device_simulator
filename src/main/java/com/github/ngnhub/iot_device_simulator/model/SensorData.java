@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
+@Builder // TODO: 22.01.2024 record
 public class SensorData {
 
     private String topic;
