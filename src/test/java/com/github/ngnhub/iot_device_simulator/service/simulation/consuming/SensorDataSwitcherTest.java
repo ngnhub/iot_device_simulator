@@ -1,12 +1,10 @@
 package com.github.ngnhub.iot_device_simulator.service.simulation.consuming;
 
-import com.github.ngnhub.iot_device_simulator.model.ChangeDeviceValueRequest;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,10 +33,9 @@ class SensorDataSwitcherTest {
         var fan = fan();
         topicToValue.put(fan.topic(), fan.initValue());
         topicToDescription.put(fan.topic(), fan);
-        var request = Mono.just(new ChangeDeviceValueRequest(fan.topic(), 1.0));
 
         // when
-        var monoData = switcher.switchOn(request);
+        var monoData = switcher.switchOn(fan.topic(), 1.0);
 
         // then
         StepVerifier.create(monoData)
@@ -50,12 +47,11 @@ class SensorDataSwitcherTest {
     @Test
     void shouldSendErrorMessageIfTopicDoesNotExist() {
         // given
-        var request = Mono.just(new ChangeDeviceValueRequest("test_topic", 1.0));
         assertTrue(topicToValue.isEmpty());
         assertTrue(topicToDescription.isEmpty());
 
         // when
-        var monoData = switcher.switchOn(request);
+        var monoData = switcher.switchOn("test_topic", 1.0);
 
         // then
         StepVerifier.create(monoData)
@@ -72,10 +68,9 @@ class SensorDataSwitcherTest {
         var fan = fan();
         topicToValue.put(fan.topic(), fan.initValue());
         topicToDescription.put(fan.topic(), fan);
-        var request = Mono.just(new ChangeDeviceValueRequest(fan.topic(), "1.0"));
 
         // when
-        var monoData = switcher.switchOn(request);
+        var monoData = switcher.switchOn(fan.topic(), "1.0");
 
         // then
         StepVerifier.create(monoData)
@@ -91,10 +86,9 @@ class SensorDataSwitcherTest {
         var fan = fan();
         topicToValue.put(fan.topic(), fan.initValue());
         topicToDescription.put(fan.topic(), fan);
-        var request = Mono.just(new ChangeDeviceValueRequest(fan.topic(), 3.0));
 
         // when
-        var monoData = switcher.switchOn(request);
+        var monoData = switcher.switchOn(fan.topic(), 3.0);
 
         // then
         StepVerifier.create(monoData)

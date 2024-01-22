@@ -58,26 +58,23 @@ public class MqttSensorDataProducerRunner {
         }
     }
 
-
     private void runMqttProducer() {
         producer.initProduce()
-                .doOnError(err -> handleError(err, this::runMqttProducer))
+                .doOnError(this::handleError)
                 .onErrorComplete()
                 .subscribe();
     }
 
     private void runMqttConsumer() {
         consumer.initSubscriptionsOnSwitchableTopics()
-                .doOnError(err -> handleError(err, this::runMqttConsumer))
-                .onErrorComplete()
                 .subscribe();
     }
 
-    private void handleError(Throwable err, Runnable task) {
+    private void handleError(Throwable err) {
         log.error("{} Error occurred while publishing mqtt messages: {}", MQTT_LOG_TAG, err.getMessage());
         if (err instanceof MqttException && RETRIABLE_REASONS.contains(((MqttException) err).getReasonCode())) {
             log.info("{} Try to revive mqtt connection...", MQTT_LOG_TAG);
-            scheduleRetry(task);
+            scheduleProducerRetry();
         }
     }
 
@@ -86,18 +83,18 @@ public class MqttSensorDataProducerRunner {
      * It divides the maximum reconnection delay by 2 to minimize inaccuracy when the retry is scheduled just before
      * the reconnection.
      */
-    private void scheduleRetry(Runnable task) {
+    private void scheduleProducerRetry() {
         int reconnectionDelay = options.getMaxReconnectDelay() / 2;
-        singleThreadScheduler().schedule(retryTask(task), reconnectionDelay, TimeUnit.MILLISECONDS);
+        singleThreadScheduler().schedule(retryProducerTask(), reconnectionDelay, TimeUnit.MILLISECONDS);
     }
 
-    private Runnable retryTask(Runnable task) {
+    private Runnable retryProducerTask() {
         return () -> {
             if (client.isConnected()) {
-                task.run();
+                init();
                 log.info("{} Mqtt publishing revived", MQTT_LOG_TAG);
             } else {
-                scheduleRetry(task);
+                scheduleProducerRetry();
                 log.info("{} Mqtt client is still disconnected...", MQTT_LOG_TAG);
             }
         };
