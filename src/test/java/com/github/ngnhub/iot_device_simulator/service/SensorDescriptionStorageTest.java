@@ -10,6 +10,7 @@ import reactor.test.StepVerifier;
 
 import java.io.IOException;
 
+import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.fan;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.gpio;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.temperature;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,21 +60,11 @@ class SensorDescriptionStorageTest extends BaseTest {
         // then
         var gpio = gpio();
         var temperature = temperature();
+        var fan = fan();
         StepVerifier.create(actual)
+                .expectNext(fan)
                 .expectNext(temperature)
                 .expectNext(gpio)
-                .verifyComplete();
-    }
-
-    @Test
-    void shouldReturnAllTopics() {
-        // when
-        var actual = sensorDescriptionStorage.getAllTopics();
-
-        // then
-        StepVerifier.create(actual)
-                .expectNext("temperature")
-                .expectNext("gpio")
                 .verifyComplete();
     }
 }

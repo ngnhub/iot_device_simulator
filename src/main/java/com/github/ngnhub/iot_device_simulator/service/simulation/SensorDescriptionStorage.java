@@ -37,10 +37,6 @@ public class SensorDescriptionStorage {
         return Flux.fromIterable(descriptions.values());
     }
 
-    public Flux<String> getAllTopics() {
-        return getAll().map(SensorDescription::topic);
-    }
-
     /**
      * No need to utilize mono here, just for simulating kind of blocking storage
      */

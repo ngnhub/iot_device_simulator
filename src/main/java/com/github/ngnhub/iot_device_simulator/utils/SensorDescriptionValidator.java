@@ -21,6 +21,7 @@ public class SensorDescriptionValidator {
         validateStringHasPossibleValues(description);
         validatePossibleValuesMatchType(description);
         validateSwitcherAndContainsInitValueAndPossibleValues(description);
+        validateNotSwitcherAndHastInterval(description);
     }
 
     private void validateStringHasPossibleValues(SensorDescription description) {
@@ -53,6 +54,12 @@ public class SensorDescriptionValidator {
             if (!initValueTypeName.equals(sensorTypeName)) {
                 throwError("Init value type is not matched to sensor type. Topic: ", description.topic());
             }
+        }
+    }
+
+    private void validateNotSwitcherAndHastInterval(SensorDescription description) {
+        if (!description.switcher() && description.interval() == null) {
+            throwError("Interval must not be null if not switchable. Topic: ", description.topic());
         }
     }
 
