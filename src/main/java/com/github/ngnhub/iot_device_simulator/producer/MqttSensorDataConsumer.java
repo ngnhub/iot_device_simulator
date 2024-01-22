@@ -10,14 +10,16 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnBean(MqttClient.class)
 public class MqttSensorDataConsumer {
 
-    private final MqttClient client;
+    private final MqttClient mqttClient;
     private final SensorDataSwitcher switcher;
     private final Flux<String> topicsOfSwitchableDevices;
     private final SensorDataPublisher publisher;
@@ -32,7 +34,7 @@ public class MqttSensorDataConsumer {
     }
 
     private void subscribe(String switchableTopic) throws MqttException {
-        client.subscribe(
+        mqttClient.subscribe(
                 switchableTopic,
                 (topic, message) -> switcher
                         .switchOn(Mono.just(new ChangeDeviceValueRequest(topic, message)))

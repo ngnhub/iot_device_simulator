@@ -5,7 +5,6 @@ import com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory;
 import com.github.ngnhub.iot_device_simulator.model.ChangeDeviceValueRequest;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
-import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -21,11 +20,10 @@ public class SensorDataSwitcher {
 
     private final ConcurrentHashMap<String, Object> topicToSwitchableValue;
     private final ConcurrentHashMap<String, SensorDescription> topicToDescriptionOfSwitchable;
-    private final SensorDataPublisher publisher;
 
     public Mono<SensorData> switchOn(Mono<ChangeDeviceValueRequest> request) {
         return request.flatMap(changeValue -> Mono.fromCallable(() -> switchAndGet(changeValue))
-                        .onErrorResume((err) -> computeError(changeValue, (Exception) err)));
+                .onErrorResume((err) -> computeError(changeValue, (Exception) err)));
     }
 
     private SensorData switchAndGet(ChangeDeviceValueRequest changeValue) {

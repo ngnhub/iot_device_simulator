@@ -1,6 +1,7 @@
 package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.producer.MqttSensorDataConsumer;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -47,6 +48,17 @@ public class MqttSensorDataProducerRunner {
         runMqttProducer();
         runMqttConsumer();
     }
+
+    @PreDestroy
+    public void tearDown() {
+        try {
+            client.disconnect();
+            log.info("{} Mqtt client has been disconnected", MQTT_LOG_TAG);
+        } catch (MqttException e) {
+            log.error("{} Mqtt client disconnection error", MQTT_LOG_TAG, e);
+        }
+    }
+
 
     private void runMqttProducer() {
         producer.initProduce()

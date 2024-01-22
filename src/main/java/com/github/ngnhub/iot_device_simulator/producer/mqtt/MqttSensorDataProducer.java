@@ -5,9 +5,7 @@ import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import jakarta.annotation.Nullable;
-import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -20,12 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-import static com.github.ngnhub.iot_device_simulator.config.MqttClientConfig.MQTT_LOG_TAG;
-
 /**
  * to read locally mosquitto_sub -h localhost -p 1883 -t +/gpio -u admin -P admin
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnBean(MqttClient.class)
@@ -35,16 +30,6 @@ public class MqttSensorDataProducer {
     private final SensorDescriptionStorage storage;
     private final MqttClient mqttClient;
     private final MqttProps props;
-
-    @PreDestroy
-    public void tearDown() {
-        try {
-            mqttClient.disconnect();
-            log.info("{} Mqtt client has been disconnected", MQTT_LOG_TAG);
-        } catch (MqttException e) {
-            log.error("{} Mqtt client disconnection error", MQTT_LOG_TAG, e);
-        }
-    }
 
     public Flux<Void> initProduce() {
         return storage.getAll()

@@ -197,4 +197,13 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
         verify(consumer).initSubscriptionsOnSwitchableTopics();
         verify(client, never()).isConnected();
     }
+
+    @Test
+    void shouldDisconnect() throws Exception {
+        // when
+        runner.tearDown();
+
+        // then
+        verify(client).disconnect();
+    }
 }

@@ -47,15 +47,6 @@ class MqttSensorDataProducerTest extends BaseTest {
     }
 
     @Test
-    void shouldDisconnect() throws Exception {
-        // when
-        producer.tearDown();
-
-        // then
-        verify(mqttClient).disconnect();
-    }
-
-    @Test
     void shouldSendTwoMessages() throws Exception {
         // given
         props.setEnableTopicUniqueIds(false);

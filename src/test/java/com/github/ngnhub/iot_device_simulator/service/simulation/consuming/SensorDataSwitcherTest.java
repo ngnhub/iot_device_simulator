@@ -2,11 +2,9 @@ package com.github.ngnhub.iot_device_simulator.service.simulation.consuming;
 
 import com.github.ngnhub.iot_device_simulator.model.ChangeDeviceValueRequest;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
-import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -22,15 +20,13 @@ class SensorDataSwitcherTest {
 
     private ConcurrentHashMap<String, Object> topicToValue;
     private ConcurrentHashMap<String, SensorDescription> topicToDescription;
-    @Mock
-    private SensorDataPublisher publisher;
     private SensorDataSwitcher switcher;
 
     @BeforeEach
     void setUp() {
         topicToValue = new ConcurrentHashMap<>();
         topicToDescription = new ConcurrentHashMap<>();
-        switcher = new SensorDataSwitcher(topicToValue, topicToDescription, publisher);
+        switcher = new SensorDataSwitcher(topicToValue, topicToDescription);
     }
 
     @Test
