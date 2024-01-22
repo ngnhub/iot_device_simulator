@@ -47,7 +47,7 @@ class SensorDataSwitcherTest {
 
         // then
         StepVerifier.create(monoData)
-                .expectNextMatches(data -> data.getTopic().equals(fan.topic()) && data.getValue().equals("1.0"))
+                .expectNextMatches(data -> data.topic().equals(fan.topic()) && data.value().equals("1.0"))
                 .verifyComplete();
         assertEquals(1.0, topicToValue.get(fan.topic()));
     }
@@ -64,8 +64,8 @@ class SensorDataSwitcherTest {
 
         // then
         StepVerifier.create(monoData)
-                .expectNextMatches(data -> data.isErrored() &&
-                        "Error {Topic does not exist or is not switchable}".equals(data.getValue()))
+                .expectNextMatches(data -> data.errored() &&
+                        "Error {Topic does not exist or is not switchable}".equals(data.value()))
                 .verifyComplete();
         assertTrue(topicToValue.isEmpty());
         assertTrue(topicToDescription.isEmpty());
@@ -84,8 +84,8 @@ class SensorDataSwitcherTest {
 
         // then
         StepVerifier.create(monoData)
-                .expectNextMatches(data -> data.isErrored() &&
-                        "Error {Incompatible type: String}".equals(data.getValue()))
+                .expectNextMatches(data -> data.errored() &&
+                        "Error {Incompatible type: String}".equals(data.value()))
                 .verifyComplete();
         assertEquals(0.0, topicToValue.get(fan.topic()));
     }
@@ -103,8 +103,8 @@ class SensorDataSwitcherTest {
 
         // then
         StepVerifier.create(monoData)
-                .expectNextMatches(data -> data.isErrored() &&
-                        "Error {\"3.0\" is not possible value for this topic}".equals(data.getValue()))
+                .expectNextMatches(data -> data.errored() &&
+                        "Error {\"3.0\" is not possible value for this topic}".equals(data.value()))
                 .verifyComplete();
         assertEquals(0.0, topicToValue.get(fan.topic()));
     }

@@ -69,9 +69,8 @@ class SensorDataSubscribeServiceTest {
     void shouldSendErrorAndUnsubscribeFinallyIfErrored() {
         // given
         var topic = "topic";
-        SensorData data1 = getSensorData(topic, "1");
-        SensorData errored = getSensorData(topic, "Error");
-        errored.setErrored(true);
+        var data1 = getSensorData(topic, "1");
+        var errored = getSensorData(topic, "Error").toBuilder().errored(true).build();
         var keyId = "id";
         when(publisher.subscribe(eq(topic), any())).thenAnswer(a -> {
             SensorDataListener argument = a.getArgument(1);

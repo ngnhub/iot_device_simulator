@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Random;
 
 import static com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory.create;
-import static com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory.create;
 
 @Slf4j
 @Service

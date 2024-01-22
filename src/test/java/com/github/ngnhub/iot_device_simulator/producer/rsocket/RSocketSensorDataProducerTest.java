@@ -60,8 +60,8 @@ class RSocketSensorDataProducerTest {
         var gpio = gpio();
         var possibleValues = gpio.possibleValues();
         assertFalse(CollectionUtils.isEmpty(possibleValues));
-        return val.getTopic().equals("gpio")
-                && possibleValues.contains(val.getValue());
+        return val.topic().equals("gpio")
+                && possibleValues.contains(val.value());
     }
 
     @Test

@@ -65,8 +65,6 @@ public class SensorDataSwitcher {
         }
     }
 
-    // TODO: 18.01.2024 mupstucr
-
     private Mono<SensorData> computeError(ChangeDeviceValueRequest changeValue, Exception err) {
         return Mono.fromCallable(() -> SensorDataFactory.create(changeValue.topic(), err));
     }

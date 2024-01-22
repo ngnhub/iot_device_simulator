@@ -3,7 +3,7 @@
     "topic": "gpio1",
     "type": "DOUBLE",
     "possibleValues": [1.0, 0.0],
-    "switcher" : true
+    "switcher": true
   },
   {
     "topic": "temperature",
@@ -17,7 +17,7 @@
     "topic": "fan/state",
     "type": "DOUBLE",
     "possibleValues": ["on", "of"],
-    "switcher" : true
+    "switcher": true
   },
   {
     "topic": "pressure",

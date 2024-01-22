@@ -20,10 +20,10 @@ class SensorDataFactoryTest {
         var data = SensorDataFactory.create(gpio, value);
 
         // then
-        assertEquals(gpio.topic(), data.getTopic());
-        assertEquals("0", data.getValue());
-        assertFalse(data.isErrored());
-        assertNotNull(data.getTime());
+        assertEquals(gpio.topic(), data.topic());
+        assertEquals("0", data.value());
+        assertFalse(data.errored());
+        assertNotNull(data.time());
     }
 
     @Test
@@ -37,9 +37,9 @@ class SensorDataFactoryTest {
 
         // then
         var expected = String.format("Error {%s}", testErrorMessage);
-        assertEquals(topic, data.getTopic());
-        assertEquals(expected, data.getValue());
-        assertTrue(data.isErrored());
-        assertNotNull(data.getTime());
+        assertEquals(topic, data.topic());
+        assertEquals(expected, data.value());
+        assertTrue(data.errored());
+        assertNotNull(data.topic());
     }
 }

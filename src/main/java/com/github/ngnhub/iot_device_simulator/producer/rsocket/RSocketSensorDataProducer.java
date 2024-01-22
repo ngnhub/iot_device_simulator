@@ -23,6 +23,6 @@ public class RSocketSensorDataProducer {
     @MessageMapping("subscribe/value/{topic}")
     public Flux<String> streamValues(@DestinationVariable String topic) {
         return publisher.subscribeOn(topic)
-                .map(SensorData::getValue);
+                .map(SensorData::value);
     }
 }

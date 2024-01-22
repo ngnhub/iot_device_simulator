@@ -60,8 +60,7 @@ class SensorDataPublisherTest extends BaseTest {
     void shouldSendErrored() {
         // given
         var topic = "topic";
-        var data = getSensorData(topic, "on");
-        data.setErrored(true);
+        var data = getSensorData(topic, "on").toBuilder().errored(true).build();
         Map<String, SensorDataListener> queues = new HashMap<>();
         var key1 = "key1";
         var key2 = "key2";

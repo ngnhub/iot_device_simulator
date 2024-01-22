@@ -59,10 +59,10 @@ public class MqttSensorDataProducer {
 
     private Mono<Void> publish(SensorData data, @Nullable Integer qos) {
         Mono<Void> mono = Mono.fromCallable(() -> {
-            var topic = generateTopic(data.getTopic());
+            var topic = generateTopic(data.topic());
             var mqttMessage = new MqttMessage();
             mqttMessage.setQos(qos == null ? props.getQos() : qos);
-            byte[] payload = convertValue(data.getValue());
+            byte[] payload = convertValue(data.value());
             mqttMessage.setPayload(payload);
             sendMessage(topic, mqttMessage);
             return null;

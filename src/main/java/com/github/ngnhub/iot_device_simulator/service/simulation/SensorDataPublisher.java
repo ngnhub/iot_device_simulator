@@ -17,14 +17,14 @@ public class SensorDataPublisher {
     private final ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageListeners;
 
     public void publish(SensorData data) {
-        var topic = data.getTopic();
+        var topic = data.topic();
         topicToMessageListeners.computeIfPresent(topic, (key, consumers) -> fanOut(data, consumers));
     }
 
     private Map<String, SensorDataListener> fanOut(SensorData data, Map<String, SensorDataListener> consumers) {
         consumers.values().forEach(listener -> {
             listener.onData(data);
-            if (data.isErrored()) {
+            if (data.errored()) {
                 listener.onError(data);
             }
         });

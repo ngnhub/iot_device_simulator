@@ -79,12 +79,12 @@ class MqttSensorDataProducerTest extends BaseTest {
         verify(mqttClient).publish(eq(gpioTopic), mqttMessageArgumentCaptor.capture());
         MqttMessage message = mqttMessageArgumentCaptor.getValue();
         assertEquals(2, message.getQos());
-        assertEquals(gpioData.getValue(), new String(message.getPayload()));
+        assertEquals(gpioData.value(), new String(message.getPayload()));
 
         verify(mqttClient).publish(eq(temperatureTopic), mqttMessageArgumentCaptor.capture());
         message = mqttMessageArgumentCaptor.getValue();
         assertEquals(1, message.getQos());
-        assertEquals(temperatureData.getValue(), new String(message.getPayload()));
+        assertEquals(temperatureData.value(), new String(message.getPayload()));
     }
 
     @Test
