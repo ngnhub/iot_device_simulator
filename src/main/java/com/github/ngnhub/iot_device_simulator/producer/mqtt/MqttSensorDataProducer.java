@@ -62,7 +62,7 @@ public class MqttSensorDataProducer {
             var topic = generateTopic(data.getTopic());
             var mqttMessage = new MqttMessage();
             mqttMessage.setQos(qos == null ? props.getQos() : qos);
-            byte[] payload = convertValue(data.getSensorData());
+            byte[] payload = convertValue(data.getValue());
             mqttMessage.setPayload(payload);
             sendMessage(topic, mqttMessage);
             return null;

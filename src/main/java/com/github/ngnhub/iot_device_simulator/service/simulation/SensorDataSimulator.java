@@ -1,5 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.service.simulation;
 
+import com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+
+import static com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory.create;
+import static com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory.create;
 
 @Slf4j
 @Service
@@ -43,7 +46,7 @@ public class SensorDataSimulator {
         try {
             return getRandomValue(description);
         } catch (Exception e) {
-            return getErrorData(description, e);
+            return SensorDataFactory.create(description.topic(), e);
         }
     }
 
@@ -72,7 +75,7 @@ public class SensorDataSimulator {
             max = description.max();
         }
         double value = min + new Random().nextDouble() * (max - min);
-        return convertToSensorData(description, value);
+        return create(description, value);
     }
 
     private SensorData getRandomPossibleValue(SensorDescription description) {
@@ -82,22 +85,6 @@ public class SensorDataSimulator {
         }
         int index = new Random().nextInt(possibleStringValues.size());
         var value = possibleStringValues.get(index);
-        return convertToSensorData(description, value);
-    }
-
-    private SensorData convertToSensorData(SensorDescription description, Object value) {
-        String unitOfMeasure = description.unitOfMeasure();
-        return SensorData.builder().topic(description.topic())
-                .sensorData(value.toString() + (unitOfMeasure == null ? "" : unitOfMeasure))
-                .time(LocalDateTime.now())
-                .build();
-    }
-
-    private SensorData getErrorData(SensorDescription description, Exception exc) {
-        return SensorData.builder().topic(description.topic())
-                .sensorData("Error {" + exc.getMessage() + "}")
-                .time(LocalDateTime.now())
-                .errored(true)
-                .build();
+        return create(description, value);
     }
 }

@@ -1,6 +1,7 @@
 package com.github.ngnhub.iot_device_simulator.service.simulation;
 
 import com.github.ngnhub.iot_device_simulator.error.NotFoundException;
+import com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory;
 import com.github.ngnhub.iot_device_simulator.model.ChangeDeviceValueRequest;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
@@ -9,10 +10,10 @@ import reactor.core.publisher.Mono;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 
-// TODO: 18.01.2024 tests
+import static com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory.create;
+
 @Service
 @RequiredArgsConstructor
 public class SensorDataSwitcher {
@@ -30,7 +31,7 @@ public class SensorDataSwitcher {
     private SensorData switchAndGet(ChangeDeviceValueRequest changeValue) {
         var newValue = topicToValue.compute(changeValue.topic(), (key, oldVal) -> validate(changeValue, oldVal));
         var description = topicToDescription.get(changeValue.topic());
-        return convertToSensorData(description, newValue);
+        return create(description, newValue);
     }
 
     private Object validate(ChangeDeviceValueRequest changeValue, Object oldVal) {
@@ -65,23 +66,8 @@ public class SensorDataSwitcher {
     }
 
     // TODO: 18.01.2024 mupstucr
-    private SensorData convertToSensorData(SensorDescription description, Object value) {
-        String unitOfMeasure = description.unitOfMeasure();
-        return SensorData.builder().topic(description.topic())
-                .sensorData(value.toString() + (unitOfMeasure == null ? "" : unitOfMeasure))
-                .time(LocalDateTime.now())
-                .build();
-    }
 
     private Mono<SensorData> computeError(ChangeDeviceValueRequest changeValue, Exception err) {
-        return Mono.fromCallable(() -> getErrorData(changeValue.topic(), err));
-    }
-
-    private SensorData getErrorData(String topic, Exception exc) {
-        return SensorData.builder().topic(topic)
-                .sensorData("Error {" + exc.getMessage() + "}")
-                .time(LocalDateTime.now())
-                .errored(true)
-                .build();
+        return Mono.fromCallable(() -> SensorDataFactory.create(changeValue.topic(), err));
     }
 }

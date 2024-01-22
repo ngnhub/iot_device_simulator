@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class SensorData {
 
     private String topic;
-    private String sensorData;
+    private String value;
     private LocalDateTime time;
     private boolean errored;
 }

@@ -13,7 +13,7 @@ public class TestSensorDataFactory {
     public static SensorData getSensorData(String topic, String value) {
         return SensorData.builder()
                 .topic(topic)
-                .sensorData(value)
+                .value(value)
                 .time(TEST_SENSOR_TIME)
                 .build();
     }

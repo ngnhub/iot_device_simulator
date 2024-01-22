@@ -75,12 +75,12 @@ class SensorDataSimulatorTest extends BaseTest {
         SensorData gpioCaptured = allValues.get(0);
         assertEquals(gpio.topic(), gpioCaptured.getTopic());
         assertFalse(CollectionUtils.isEmpty(gpio.possibleValues()));
-        assertTrue(gpio.possibleValues().contains(gpioCaptured.getSensorData()));
+        assertTrue(gpio.possibleValues().contains(gpioCaptured.getValue()));
 
         SensorData temperatureCaptured = allValues.get(1);
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
 
-        String capturedTemperatureData = temperatureCaptured.getSensorData();
+        String capturedTemperatureData = temperatureCaptured.getValue();
         assertTrue(capturedTemperatureData.endsWith(temperature.unitOfMeasure()));
         capturedTemperatureData = capturedTemperatureData.replace("C", "");
         double sensorData = Double.parseDouble(capturedTemperatureData);
@@ -110,7 +110,7 @@ class SensorDataSimulatorTest extends BaseTest {
         SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
 
-        String capturedTemperatureData = temperatureCaptured.getSensorData();
+        String capturedTemperatureData = temperatureCaptured.getValue();
         assertTrue(capturedTemperatureData.endsWith(temperature.unitOfMeasure()));
         capturedTemperatureData = capturedTemperatureData.replace("C", "");
         double sensorData = Double.parseDouble(capturedTemperatureData);
@@ -140,7 +140,7 @@ class SensorDataSimulatorTest extends BaseTest {
         SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
 
-        String capturedTemperatureData = temperatureCaptured.getSensorData();
+        String capturedTemperatureData = temperatureCaptured.getValue();
         assertTrue(capturedTemperatureData.endsWith(temperature.unitOfMeasure()));
         capturedTemperatureData = capturedTemperatureData.replace("C", "");
         double sensorData = Double.parseDouble(capturedTemperatureData);
@@ -171,7 +171,7 @@ class SensorDataSimulatorTest extends BaseTest {
         SensorData temperatureCaptured = eventArgumentCaptor.getValue();
         assertEquals(temperature.topic(), temperatureCaptured.getTopic());
 
-        String capturedTemperatureData = temperatureCaptured.getSensorData();
+        String capturedTemperatureData = temperatureCaptured.getValue();
         assertTrue(capturedTemperatureData.endsWith(temperature.unitOfMeasure()));
         capturedTemperatureData = capturedTemperatureData.replace("C", "");
         double sensorData = Double.parseDouble(capturedTemperatureData);
@@ -204,7 +204,7 @@ class SensorDataSimulatorTest extends BaseTest {
         assertTrue(CollectionUtils.isEmpty(gpio.possibleValues()));
         assertEquals(
                 "Error {There is no possible values for: " + gpio.topic() + "}",
-                gpioCaptured.getSensorData()
+                gpioCaptured.getValue()
         );
     }
 }
