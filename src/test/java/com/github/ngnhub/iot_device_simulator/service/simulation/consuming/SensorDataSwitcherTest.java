@@ -1,9 +1,8 @@
-package com.github.ngnhub.iot_device_simulator.service;
+package com.github.ngnhub.iot_device_simulator.service.simulation.consuming;
 
 import com.github.ngnhub.iot_device_simulator.model.ChangeDeviceValueRequest;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataSwitcher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

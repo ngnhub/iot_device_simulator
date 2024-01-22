@@ -2,8 +2,8 @@ package com.github.ngnhub.iot_device_simulator.service;
 
 import com.github.ngnhub.iot_device_simulator.config.InternalProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher.SensorDataListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Exceptions;

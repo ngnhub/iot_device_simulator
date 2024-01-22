@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SensorDataSwitcherConfig {
 
     @Bean
-    public ConcurrentHashMap<String, Object> topicToValue(SensorDescriptionStorage storage) {
+    public ConcurrentHashMap<String, Object> topicToSwitchableValue(SensorDescriptionStorage storage) {
         ConcurrentHashMap<String, Object> topicToValue = new ConcurrentHashMap<>();
         List<SensorDescription> descriptions = storage.getAll()
                 .filter(SensorDescription::switcher)
@@ -27,7 +27,7 @@ public class SensorDataSwitcherConfig {
     }
 
     @Bean
-    public ConcurrentHashMap<String, SensorDescription> topicToDescription(SensorDescriptionStorage storage) {
+    public ConcurrentHashMap<String, SensorDescription> topicToDescriptionOfSwitchable(SensorDescriptionStorage storage) {
         ConcurrentHashMap<String, SensorDescription> topicToDescription = new ConcurrentHashMap<>();
         List<SensorDescription> descriptions = storage.getAll()
                 .filter(SensorDescription::switcher)
@@ -37,5 +37,14 @@ public class SensorDataSwitcherConfig {
             descriptions.forEach(description -> topicToDescription.put(description.topic(), description));
         }
         return topicToDescription;
+    }
+
+    @Bean
+    public List<String> topicsOfSwitchableDevices(SensorDescriptionStorage storage) {
+        return storage.getAll()
+                .filter(SensorDescription::switcher)
+                .map(SensorDescription::topic)
+                .collectList()
+                .block();
     }
 }

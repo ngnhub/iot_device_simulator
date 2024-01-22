@@ -1,10 +1,11 @@
-package com.github.ngnhub.iot_device_simulator.service.simulation;
+package com.github.ngnhub.iot_device_simulator.service.simulation.consuming;
 
 import com.github.ngnhub.iot_device_simulator.error.NotFoundException;
 import com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory;
 import com.github.ngnhub.iot_device_simulator.model.ChangeDeviceValueRequest;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -18,8 +19,8 @@ import static com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory.cr
 @RequiredArgsConstructor
 public class SensorDataSwitcher {
 
-    private final ConcurrentHashMap<String, Object> topicToValue;
-    private final ConcurrentHashMap<String, SensorDescription> topicToDescription;
+    private final ConcurrentHashMap<String, Object> topicToSwitchableValue;
+    private final ConcurrentHashMap<String, SensorDescription> topicToDescriptionOfSwitchable;
     private final SensorDataPublisher publisher;
 
     public Mono<SensorData> switchOn(Mono<ChangeDeviceValueRequest> request) {
@@ -29,8 +30,11 @@ public class SensorDataSwitcher {
     }
 
     private SensorData switchAndGet(ChangeDeviceValueRequest changeValue) {
-        var newValue = topicToValue.compute(changeValue.topic(), (key, oldVal) -> validate(changeValue, oldVal));
-        var description = topicToDescription.get(changeValue.topic());
+        var newValue = topicToSwitchableValue.compute(
+                changeValue.topic(),
+                (key, oldVal) -> validate(changeValue, oldVal)
+        );
+        var description = topicToDescriptionOfSwitchable.get(changeValue.topic());
         return create(description, newValue);
     }
 
@@ -56,8 +60,8 @@ public class SensorDataSwitcher {
     }
 
     private void validatePossibleValues(String topic, Object newVal) {
-        if (topicToDescription.containsKey(topic)) {
-            SensorDescription description = topicToDescription.get(topic);
+        if (topicToDescriptionOfSwitchable.containsKey(topic)) {
+            SensorDescription description = topicToDescriptionOfSwitchable.get(topic);
             if (description.possibleValues() != null && !description.possibleValues().contains(newVal)) {
                 throw new IllegalArgumentException(String.format(
                         "\"%s\" is not possible value for this topic", newVal));

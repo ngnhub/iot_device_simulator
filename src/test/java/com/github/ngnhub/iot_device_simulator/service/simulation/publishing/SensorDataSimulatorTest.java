@@ -1,10 +1,8 @@
-package com.github.ngnhub.iot_device_simulator.service;
+package com.github.ngnhub.iot_device_simulator.service.simulation.publishing;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataSimulator;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,8 +1,9 @@
-package com.github.ngnhub.iot_device_simulator.service.simulation;
+package com.github.ngnhub.iot_device_simulator.service.simulation.publishing;
 
 import com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
+import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;

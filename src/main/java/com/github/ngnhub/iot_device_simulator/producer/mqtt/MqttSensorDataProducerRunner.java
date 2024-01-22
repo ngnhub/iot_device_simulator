@@ -1,5 +1,7 @@
 package com.github.ngnhub.iot_device_simulator.producer.mqtt;
 
+import com.github.ngnhub.iot_device_simulator.error.MqttWrapperException;
+import com.github.ngnhub.iot_device_simulator.producer.MqttSensorDataConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -30,7 +32,8 @@ public class MqttSensorDataProducerRunner {
             Short.valueOf(REASON_CODE_CLIENT_CLOSED).intValue()
     );
 
-    private final MqttSensorDataProducer publisher;
+    private final MqttSensorDataProducer producer;
+    private final MqttSensorDataConsumer consumer;
     private final MqttConnectOptions options;
 
     @Lookup
@@ -40,10 +43,15 @@ public class MqttSensorDataProducerRunner {
 
     @EventListener(ApplicationContextEvent.class)
     public void runMqtt() {
-        publisher.subscribeAndProduce()
+        producer.subscribeAndProduce()
                 .doOnError(this::handleError)
                 .onErrorComplete()
                 .subscribe();
+        try {
+            consumer.initSubscribe();
+        } catch (MqttException e) {
+            throw new MqttWrapperException("Exception occurred during subscribing", e);
+        }
     }
 
     private void handleError(Throwable err) {
@@ -66,7 +74,7 @@ public class MqttSensorDataProducerRunner {
 
     private Runnable retryTask() {
         return () -> {
-            if (publisher.isConnected()) {
+            if (producer.isConnected()) {
                 runMqtt();
                 log.info("{} Mqtt publishing revived", MQTT_LOG_TAG);
             } else {

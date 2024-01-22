@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.service.simulation;
+package com.github.ngnhub.iot_device_simulator.service.simulation.publishing;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import lombok.RequiredArgsConstructor;
