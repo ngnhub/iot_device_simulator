@@ -4,6 +4,7 @@ import com.github.ngnhub.iot_device_simulator.error.NotFoundException;
 import com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
@@ -19,10 +20,12 @@ public class SensorDataSwitcher {
 
     private final ConcurrentHashMap<String, Object> topicToSwitchableValue;
     private final ConcurrentHashMap<String, SensorDescription> topicToDescriptionOfSwitchable;
+    private final SensorDataPublisher publisher;
 
     public Mono<SensorData> switchOn(String topic, Object value) {
         return Mono.fromCallable(() -> switchAndGet(topic, value))
-                .onErrorResume((err) -> computeError(topic, (Exception) err));
+                .onErrorResume((err) -> computeError(topic, (Exception) err))
+                .doOnNext(publisher::publish);
     }
 
     private SensorData switchAndGet(String topic, Object value) {

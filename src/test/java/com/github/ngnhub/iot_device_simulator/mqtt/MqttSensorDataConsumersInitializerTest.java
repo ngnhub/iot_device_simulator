@@ -1,7 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.service.simulation.consuming.SensorDataSwitcher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -28,9 +27,6 @@ class MqttSensorDataConsumersInitializerTest {
     private MqttClient mqttClient;
     @Mock
     private SensorDataSwitcher switcher;
-    private Flux<String> topicsOfSwitchableDevices;
-    @Mock
-    private SensorDataPublisher publisher;
     @Captor
     private ArgumentCaptor<IMqttMessageListener> messageListenerCaptor;
     private MqttSensorDataConsumersInitializer initializer;
@@ -38,12 +34,11 @@ class MqttSensorDataConsumersInitializerTest {
 
     @BeforeEach
     void setUp() {
-        topicsOfSwitchableDevices = Flux.just("topic");
+        Flux<String> topicsOfSwitchableDevices = Flux.just("topic");
         initializer = new MqttSensorDataConsumersInitializer(
                 mqttClient,
                 switcher,
-                topicsOfSwitchableDevices,
-                publisher
+                topicsOfSwitchableDevices
         );
     }
 
@@ -61,6 +56,5 @@ class MqttSensorDataConsumersInitializerTest {
         verify(mqttClient).subscribe(eq(topic), messageListenerCaptor.capture());
         messageListenerCaptor.getValue().messageArrived(topic, new MqttMessage(expectedValue.getBytes()));
         verify(switcher).switchOn(topic, expectedValue);
-        verify(publisher).publish(data);
     }
 }

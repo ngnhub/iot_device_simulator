@@ -17,4 +17,13 @@ public class TestSensorDataFactory {
                 .time(TEST_SENSOR_TIME)
                 .build();
     }
+
+    public static SensorData getErroredData(String topic, String message) {
+        return SensorData.builder()
+                .topic(topic)
+                .value(message)
+                .errored(true)
+                .time(TEST_SENSOR_TIME)
+                .build();
+    }
 }

@@ -9,6 +9,7 @@ version = "0.0.1-SNAPSHOT"
 
 // versions
 val mqttVersion = "1.2.5"
+val assertJVersion = "3.25.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -37,6 +38,7 @@ dependencies {
 
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")

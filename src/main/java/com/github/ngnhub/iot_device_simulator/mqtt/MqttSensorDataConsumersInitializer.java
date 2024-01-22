@@ -1,7 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.service.simulation.consuming.SensorDataSwitcher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -24,9 +23,7 @@ public class MqttSensorDataConsumersInitializer {
     private final MqttClient mqttClient;
     private final SensorDataSwitcher switcher;
     private final Flux<String> topicsOfSwitchableDevices;
-    private final SensorDataPublisher publisher;
 
-    // TODO: 22.01.2024 test
     public Flux<Void> initSubscriptionsOnSwitchableTopics() {
         return topicsOfSwitchableDevices
                 .flatMap(topic -> Mono.fromCallable(() -> {
@@ -40,7 +37,7 @@ public class MqttSensorDataConsumersInitializer {
                 switchableTopic,
                 (topic, message) -> switcher
                         .switchOn(topic, convert(message))
-                        .subscribe(publisher::publish)
+                        .subscribe()
         );
     }
 
