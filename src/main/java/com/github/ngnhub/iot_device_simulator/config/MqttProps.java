@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
 
+// TODO: 22.01.2024 consumer producer enabled separation
 @Data
 @Validated
 @Configuration

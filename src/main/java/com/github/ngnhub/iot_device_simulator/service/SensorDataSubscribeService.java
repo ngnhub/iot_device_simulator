@@ -66,7 +66,6 @@ public class SensorDataSubscribeService {
 
         @Override
         public void onError(SensorData data) {
-            dataFluxSink.next(data);
             dataFluxSink.complete();
         }
     }
