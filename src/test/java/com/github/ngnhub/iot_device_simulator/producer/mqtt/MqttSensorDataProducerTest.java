@@ -93,9 +93,10 @@ class MqttSensorDataProducerTest extends BaseTest {
         props.setEnableTopicUniqueIds(false);
         var basePath = "/base/path";
         props.setTopicBasePath(basePath);
-        var gpioTopic = gpio().topic();
+        var gpio = gpio();
+        var gpioTopic = gpio.topic();
 
-        when(storage.getAllTopics()).thenReturn(Flux.just(gpioTopic));
+        when(storage.getAll()).thenReturn(Flux.just(gpio));
         var gpioData = getSensorData(gpioTopic, "1");
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
@@ -111,9 +112,10 @@ class MqttSensorDataProducerTest extends BaseTest {
     void shouldSendMessageWithId() throws Exception {
         // given
         props.setEnableTopicUniqueIds(true);
-        var gpioTopic = gpio().topic();
+        var gpio = gpio();
+        var gpioTopic = gpio.topic();
 
-        when(storage.getAllTopics()).thenReturn(Flux.just(gpioTopic));
+        when(storage.getAll()).thenReturn(Flux.just(gpio));
         var gpioData = getSensorData(gpioTopic, "1");
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
@@ -132,9 +134,10 @@ class MqttSensorDataProducerTest extends BaseTest {
         props.setEnableTopicUniqueIds(true);
         var basePath = "/base/path";
         props.setTopicBasePath(basePath);
-        var gpioTopic = gpio().topic();
+        var gpio = gpio();
+        var gpioTopic = gpio.topic();
 
-        when(storage.getAllTopics()).thenReturn(Flux.just(gpioTopic));
+        when(storage.getAll()).thenReturn(Flux.just(gpio));
         var gpioData = getSensorData(gpioTopic, "1");
         when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
