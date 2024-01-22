@@ -1,7 +1,6 @@
-package com.github.ngnhub.iot_device_simulator.producer.mqtt;
+package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
-import com.github.ngnhub.iot_device_simulator.producer.MqttSensorDataConsumer;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -31,7 +30,7 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
     @Mock
     private MqttSensorDataProducer producer;
     @Mock
-    private MqttSensorDataConsumer consumer;
+    private MqttSensorDataConsumersInitializer consumer;
     @Mock
     private MqttConnectOptions options;
     @Mock

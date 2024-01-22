@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.producer;
+package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.model.ChangeDeviceValueRequest;
 import com.github.ngnhub.iot_device_simulator.service.simulation.consuming.SensorDataSwitcher;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @ConditionalOnBean(MqttClient.class)
-public class MqttSensorDataConsumer {
+public class MqttSensorDataConsumersInitializer {
 
     private final MqttClient mqttClient;
     private final SensorDataSwitcher switcher;

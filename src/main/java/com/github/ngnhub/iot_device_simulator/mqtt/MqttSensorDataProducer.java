@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.producer.mqtt;
+package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.config.MqttProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;

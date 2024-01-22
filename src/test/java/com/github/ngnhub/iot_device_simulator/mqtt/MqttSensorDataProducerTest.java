@@ -1,8 +1,9 @@
-package com.github.ngnhub.iot_device_simulator.producer.mqtt;
+package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.config.MqttProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
+import com.github.ngnhub.iot_device_simulator.mqtt.MqttSensorDataProducer;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import org.eclipse.paho.client.mqttv3.MqttClient;

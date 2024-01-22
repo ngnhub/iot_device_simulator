@@ -1,6 +1,5 @@
-package com.github.ngnhub.iot_device_simulator.producer.mqtt;
+package com.github.ngnhub.iot_device_simulator.mqtt;
 
-import com.github.ngnhub.iot_device_simulator.producer.MqttSensorDataConsumer;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,7 @@ public class MqttSensorDataProducerRunner {
     );
 
     private final MqttSensorDataProducer producer;
-    private final MqttSensorDataConsumer consumer;
+    private final MqttSensorDataConsumersInitializer consumer;
     private final MqttConnectOptions options;
     private final MqttClient client;
 

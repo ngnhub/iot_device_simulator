@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.producer.rsocket;
+package com.github.ngnhub.iot_device_simulator.rsocket;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import org.junit.jupiter.api.Test;
