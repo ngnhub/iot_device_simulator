@@ -2,7 +2,6 @@ package com.github.ngnhub.iot_device_simulator.utils;
 
 import lombok.Getter;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.function.Function;

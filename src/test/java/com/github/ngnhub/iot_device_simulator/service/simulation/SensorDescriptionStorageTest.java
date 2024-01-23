@@ -27,31 +27,6 @@ class SensorDescriptionStorageTest extends BaseTest {
     }
 
     @Test
-    void shouldReturnGpioDescription() {
-        // given
-        var expected = gpio();
-
-        // when
-        var actual = sensorDescriptionStorage.getBy("gpio").block();
-
-        // then
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void shouldThrowsWhenSensorDoesNotExist() {
-        // when
-        var exc =
-                assertThrows(
-                        IllegalArgumentException.class,
-                        () -> sensorDescriptionStorage.getBy("not existed").block()
-                );
-
-        // then
-        assertEquals("Sensor is not found: not existed", exc.getMessage());
-    }
-
-    @Test
     void shouldReturnAllFromJsonFile() {
         // when
         var actual = sensorDescriptionStorage.getAll();

@@ -6,6 +6,7 @@ import com.github.ngnhub.iot_device_simulator.service.simulation.consuming.Senso
 import com.github.ngnhub.iot_device_simulator.utils.SensorValueType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -16,7 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 
 /**
- * mosquitto_pub -h localhost -t gpio1 -m "1.0" -u admin -P admin
+ * mosquitto_pub -h localhost -t gpio1/state -m 1.0 -u admin -P admin
  */
 @Service
 @Slf4j
@@ -28,21 +29,17 @@ public class MqttSensorDataConsumersInitializer {
     private final SensorDataSwitcher switcher;
     private final SensorDescriptionStorage storage;
 
-    public Flux<Void> initSubscriptionsOnSwitchableTopics() {
+    public Flux<IMqttMessageListener> initSubscriptionsOnSwitchableTopics() {
         return storage.getOnlySwitchable()
-                .flatMap(description -> Mono.fromCallable(() -> {
-                    subscribe(description);
-                    return null;
-                }));
+                .flatMap(description -> Mono.fromCallable(() -> subscribe(description)));
     }
 
-    private void subscribe(SensorDescription description) throws MqttException {
-        mqttClient.subscribe(
-                description.switcher(),
-                (topic, message) -> convert(message, description.type())
-                        .flatMap(val -> switcher.switchOn(topic, val))
-                        .subscribe()
-        );
+    private IMqttMessageListener subscribe(SensorDescription description) throws MqttException {
+        IMqttMessageListener listener = (topic, message) -> convert(message, description.type())
+                .flatMap(val -> switcher.switchOn(topic, val))
+                .subscribe();
+        mqttClient.subscribe(description.switcher(), listener);
+        return listener;
     }
 
     private Mono<Object> convert(MqttMessage message, SensorValueType type) {

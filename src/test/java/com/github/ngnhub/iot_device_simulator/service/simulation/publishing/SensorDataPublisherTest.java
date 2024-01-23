@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFactory.getSensorData;
@@ -26,7 +24,7 @@ import static org.mockito.Mockito.verify;
 class SensorDataPublisherTest extends BaseTest {
 
     @Spy
-    private ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageQueues = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ConcurrentHashMap<String, SensorDataListener>> topicToMessageQueues = new ConcurrentHashMap<>();
     private SensorDataPublisher publisher;
 
     @BeforeEach
@@ -39,7 +37,7 @@ class SensorDataPublisherTest extends BaseTest {
         // given
         var topic = "topic";
         var data = getSensorData(topic, "on");
-        Map<String, SensorDataListener> queues = new HashMap<>();
+        ConcurrentHashMap<String, SensorDataListener> queues = new ConcurrentHashMap<>();
         var key1 = "key1";
         var key2 = "key2";
         SensorDataListener consumer1 = Mockito.spy(new TestSensorDataListener());
@@ -61,7 +59,7 @@ class SensorDataPublisherTest extends BaseTest {
         // given
         var topic = "topic";
         var data = getSensorData(topic, "on").toBuilder().errored(true).build();
-        Map<String, SensorDataListener> queues = new HashMap<>();
+        ConcurrentHashMap<String, SensorDataListener> queues = new ConcurrentHashMap<>();
         var key1 = "key1";
         var key2 = "key2";
         SensorDataListener consumer1 = spy(new TestSensorDataListener());
@@ -98,9 +96,9 @@ class SensorDataPublisherTest extends BaseTest {
         var topic = "topic";
         var subscriberId = "id";
         SensorDataListener consumer = spy(new TestSensorDataListener());
-        Map<String, SensorDataListener> map = new HashMap<>();
-        map.put(subscriberId, consumer);
-        topicToMessageQueues.put(topic, map);
+        ConcurrentHashMap<String, SensorDataListener> queues = new ConcurrentHashMap<>();
+        queues.put(subscriberId, consumer);
+        topicToMessageQueues.put(topic, queues);
         assertTrue(topicToMessageQueues.get(topic).containsKey(subscriberId));
 
         // when

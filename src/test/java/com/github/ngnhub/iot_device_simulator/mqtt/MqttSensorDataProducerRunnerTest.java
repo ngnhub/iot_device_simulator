@@ -1,6 +1,7 @@
 package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -51,7 +52,7 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
     void shouldCompleteSuccessfully() {
         // given
         Flux<Void> sentMessages = Flux.empty();
-        Flux<Void> subscriptions = Flux.empty();
+        Flux<IMqttMessageListener> subscriptions = Flux.empty();
         when(producer.initProduce()).thenReturn(sentMessages);
         when(consumer.initSubscriptionsOnSwitchableTopics()).thenReturn(subscriptions);
 
@@ -68,7 +69,7 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
     @Test
     void shouldRetryTwice() {
         // given
-        Flux<Void> subscriptions = Flux.empty();
+        Flux<IMqttMessageListener> subscriptions = Flux.empty();
         when(consumer.initSubscriptionsOnSwitchableTopics()).thenReturn(subscriptions);
         when(options.getMaxReconnectDelay()).thenReturn(1000);
         Flux<Void> firstError = Flux.error(new MqttException(REASON_CODE_CONNECTION_LOST));
@@ -100,7 +101,7 @@ class MqttSensorDataProducerRunnerTest extends BaseTest {
     @Test
     void shouldNotRetry() {
         // given
-        Flux<Void> subscriptions = Flux.empty();
+        Flux<IMqttMessageListener> subscriptions = Flux.empty();
         when(consumer.initSubscriptionsOnSwitchableTopics()).thenReturn(subscriptions);
         Flux<Void> firstError = Flux.error(new RuntimeException());
         when(producer.initProduce()).thenReturn(firstError);
