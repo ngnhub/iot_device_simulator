@@ -25,35 +25,28 @@ public class SensorDataSwitcher {
     private final Map<String, SensorDescription> switcherTopicToDescription;
     private final SensorDataPublisher publisher;
 
-    public Mono<SensorData> switchOn(String topic, Object value) {
-        return Mono.fromCallable(() -> switchAndGet(topic, value))
+    public Mono<SensorData> switchOn(String topic, byte[] payload) {
+        return Mono.fromSupplier(() -> switcherTopicToDescription.get(topic))
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Topic does not exist or is not switchable")))
+                .flatMap(description -> convert(payload, description.type())
+                        .map(value -> switchAndGet(description, value)))
                 .onErrorResume((err) -> computeError(topic, (Exception) err))
                 .doOnNext(publisher::publish);
     }
 
-    private SensorData switchAndGet(String switchTopic, Object value) {
-        var description = switcherTopicToDescription.get(switchTopic);
-        validate(description, value);
+    private Mono<Object> convert(byte[] payload, SensorValueType type) {
+        return Mono.defer(() -> type.getFromByteConverter()
+                .apply(payload)
+                .map(Mono::just)
+                .orElseThrow(() -> new IllegalArgumentException("Can not convert consumed value. Should have type: "
+                                                                        + type.getAClass())));
+    }
+
+    private SensorData switchAndGet(SensorDescription description, Object value) {
+        validatePossibleValues(value, description.possibleValues());
         return create(description, value);
     }
 
-    private void validate(SensorDescription description, Object value) {
-        validateExist(description);
-        validateType(value, description.type());
-        validatePossibleValues(value, description.possibleValues());
-    }
-
-    private void validateExist(SensorDescription description) {
-        if (description == null) {
-            throw new NotFoundException("Topic does not exist or is not switchable");
-        }
-    }
-
-    private void validateType(Object value, SensorValueType type) {
-        if (!type.getAClass().isInstance(value)) {
-            throw new IllegalArgumentException("Incompatible type: " + value.getClass().getSimpleName());
-        }
-    }
 
     private void validatePossibleValues(Object value, List<Object> possibleValues) {
         if (possibleValues != null && !possibleValues.contains(value)) {
@@ -64,8 +57,7 @@ public class SensorDataSwitcher {
     private Mono<SensorData> computeError(String switcherTopic, Exception err) {
         return Mono.fromCallable(() -> {
             log.error("Error occurred during the switching data. Topic: {}", switcherTopic, err);
-            String sensorTopic = switcherTopicToDescription.get(switcherTopic).topic();
-            return SensorDataFactory.create(sensorTopic, err);
+            return SensorDataFactory.create(switcherTopic, err);
         });
     }
 }

@@ -3,13 +3,11 @@ package com.github.ngnhub.iot_device_simulator.mqtt;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import com.github.ngnhub.iot_device_simulator.service.simulation.consuming.SensorDataSwitcher;
-import com.github.ngnhub.iot_device_simulator.utils.SensorValueType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -35,20 +33,9 @@ public class MqttSensorDataConsumersInitializer {
     }
 
     private IMqttMessageListener subscribe(SensorDescription description) throws MqttException {
-        IMqttMessageListener listener = (topic, message) -> convert(message, description.type())
-                .flatMap(val -> switcher.switchOn(topic, val))
+        IMqttMessageListener listener = (topic, message) -> switcher.switchOn(topic, message.getPayload())
                 .subscribe();
         mqttClient.subscribe(description.switcher(), listener);
         return listener;
-    }
-
-    private Mono<Object> convert(MqttMessage message, SensorValueType type) {
-        return Mono.defer(() -> {
-            byte[] payload = message.getPayload();
-            return type.getFromByteConverter()
-                    .apply(payload)
-                    .map(Mono::just)
-                    .orElseThrow(() -> new IllegalArgumentException("Can not convert consumed value"));
-        });
     }
 }

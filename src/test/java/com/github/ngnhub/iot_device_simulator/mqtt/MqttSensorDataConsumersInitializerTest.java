@@ -49,9 +49,10 @@ class MqttSensorDataConsumersInitializerTest {
     @Test
     void shouldConvertValueAndSendToSwitcher() {
         // given
-        var expectedValue = 1.0;
+        var expectedValue = String.valueOf(1.0);
+        var expectedBytes = expectedValue.getBytes();
         SensorDescription fan = fan();
-        var data = getSensorData(fan.topic(), String.valueOf(expectedValue));
+        var data = getSensorData(fan.topic(), expectedValue);
         when(storage.getOnlySwitchable()).thenReturn(Flux.just(fan));
         when(switcher.switchOn(eq(fan.switcher()), any())).thenReturn(Mono.just(data));
 
@@ -61,7 +62,7 @@ class MqttSensorDataConsumersInitializerTest {
                     try {
                         listener.messageArrived(
                                 fan.switcher(),
-                                new MqttMessage(String.valueOf(expectedValue).getBytes())
+                                new MqttMessage((expectedValue).getBytes())
                         );
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -78,38 +79,7 @@ class MqttSensorDataConsumersInitializerTest {
                     }
                 })
                 .verifyComplete();
-        verify(switcher).switchOn(fan.switcher(), expectedValue);
+        verify(switcher).switchOn(fan.switcher(), expectedBytes);
     }
 
-    @Test
-    void shouldThrowAnErrorAndNotSendToSwitcherIfInvalidFormat() throws Exception {
-        // given
-        var errored = "value";
-        SensorDescription fan = fan();
-        when(storage.getOnlySwitchable()).thenReturn(Flux.just(fan));
-        doAnswer(a -> {
-            IMqttMessageListener argument = a.getArgument(1);
-            argument.messageArrived(fan.switcher(), new MqttMessage(errored.getBytes()));
-            return null;
-        }).when(mqttClient).subscribe(any(String.class), any(IMqttMessageListener.class));
-
-        // when
-        Flux<IMqttMessageListener> result = initializer.initSubscriptionsOnSwitchableTopics()
-                .doOnNext(listener -> {
-                    try {
-                        listener.messageArrived(
-                                fan.switcher(),
-                                new MqttMessage(errored.getBytes())
-                        );
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
-        // then
-        StepVerifier.create(result)
-                .expectNextCount(1L)
-                .verifyComplete();
-        verify(switcher, never()).switchOn(any(), any());
-    }
 }

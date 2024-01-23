@@ -43,9 +43,10 @@ class SensorDataSwitcherTest {
         // given
         var fan = fan();
         topicToDescription.put(Objects.requireNonNull(fan.switcher()), fan);
+        byte[] bytes = String.valueOf(1.0).getBytes();
 
         // when
-        var monoData = switcher.switchOn(fan.topic(), 1.0);
+        var monoData = switcher.switchOn(fan.switcher(), bytes);
 
         // then
         StepVerifier.create(monoData)
@@ -58,10 +59,11 @@ class SensorDataSwitcherTest {
     void shouldSendErrorMessageIfTopicDoesNotExist() {
         // given
         assertTrue(topicToDescription.isEmpty());
-        var expectedMessage = "Error {Topic does not exist or is not switchable}";
+        var expectedMessage = "Error occurred during the data processing { Topic does not exist or is not switchable }";
+        byte[] bytes = String.valueOf(1.0).getBytes();
 
         // when
-        var monoData = switcher.switchOn("test_topic", 1.0);
+        var monoData = switcher.switchOn("test_topic", bytes);
 
         // then
         StepVerifier.create(monoData)
@@ -75,34 +77,37 @@ class SensorDataSwitcherTest {
     void shouldSendErrorMessageIfInvalidValueType() {
         // given
         var fan = fan();
-        topicToDescription.put(fan.topic(), fan);
-        var expectedMessage = "Error {Incompatible type: String}";
+        topicToDescription.put(Objects.requireNonNull(fan.switcher()), fan);
+        var expectedMessage = "Error occurred during the data processing " +
+                "{ Can not convert consumed value. Should have type: class java.lang.Double }";
+        byte[] bytes = "value".getBytes();
 
         // when
-        var monoData = switcher.switchOn(fan.topic(), "1.0");
+        var monoData = switcher.switchOn(fan.switcher(), bytes);
 
         // then
         StepVerifier.create(monoData)
                 .expectNextMatches(data -> data.errored() && expectedMessage.equals(data.value()))
                 .verifyComplete();
-        verifyErroredDataIsPublished(getErroredData(fan.topic(), expectedMessage));
+        verifyErroredDataIsPublished(getErroredData(fan.switcher(), expectedMessage));
     }
 
     @Test
     void shouldSendErrorMessageIfValueIsNotInPossibleValues() {
         // given
         var fan = fan();
-        topicToDescription.put(fan.topic(), fan);
-        var expectedMessage = "Error {\"3.0\" is not possible value for this topic}";
+        topicToDescription.put(Objects.requireNonNull(fan.switcher()), fan);
+        var expectedMessage = "Error occurred during the data processing { \"3.0\" is not possible value for this topic }";
+        byte[] bytes = String.valueOf(3.0).getBytes();
 
         // when
-        var monoData = switcher.switchOn(fan.topic(), 3.0);
+        var monoData = switcher.switchOn(fan.switcher(), bytes);
 
         // then
         StepVerifier.create(monoData)
                 .expectNextMatches(data -> data.errored() && expectedMessage.equals(data.value()))
                 .verifyComplete();
-        verifyErroredDataIsPublished(getErroredData(fan.topic(), expectedMessage));
+        verifyErroredDataIsPublished(getErroredData(fan.switcher(), expectedMessage));
     }
 
     private void verifyErroredDataIsPublished(SensorData expected) {
