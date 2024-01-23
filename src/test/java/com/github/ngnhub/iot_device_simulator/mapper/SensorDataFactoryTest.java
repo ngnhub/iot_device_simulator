@@ -36,7 +36,7 @@ class SensorDataFactoryTest {
         var data = SensorDataFactory.create(topic, new RuntimeException(testErrorMessage));
 
         // then
-        var expected = String.format("Error {%s}", testErrorMessage);
+        var expected = String.format("Error occurred during the data processing { %s }", testErrorMessage);
         assertEquals(topic, data.topic());
         assertEquals(expected, data.value());
         assertTrue(data.errored());

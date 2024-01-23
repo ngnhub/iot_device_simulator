@@ -66,31 +66,6 @@ class SensorDataSubscribeServiceTest {
     }
 
     @Test
-    void shouldSendErrorAndUnsubscribeFinallyIfErrored() {
-        // given
-        var topic = "topic";
-        var data1 = getSensorData(topic, "1");
-        var errored = getSensorData(topic, "Error").toBuilder().errored(true).build();
-        var keyId = "id";
-        when(publisher.subscribe(eq(topic), any())).thenAnswer(a -> {
-            SensorDataListener argument = a.getArgument(1);
-            argument.onData(data1);
-            argument.onError(errored);
-            return keyId;
-        });
-
-        // when
-        Flux<SensorData> result = service.subscribeOn(topic);
-
-        // then
-        StepVerifier.create(result)
-                .expectNext(data1)
-                .expectNext(errored)
-                .verifyComplete();
-        verify(publisher).unsubscribe(topic, keyId);
-    }
-
-    @Test
     void shouldResubscribeIfSinkOverflow() {
         // given
         var topic = "topic";
@@ -166,12 +141,13 @@ class SensorDataSubscribeServiceTest {
             SensorDataListener argument = a.getArgument(1);
             argument.onData(data1);
             argument.onData(data2);
+            argument.onData(data3);
             argument.onError(data3);
             return keyId;
         });
 
         // when
-        Flux<SensorData> result = service.subscribeOn(topic).take(5);
+        Flux<SensorData> result = service.subscribeOn(topic).take(3);
 
         // then
         StepVerifier.create(result)

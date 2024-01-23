@@ -201,7 +201,7 @@ class SensorDataSimulatorTest extends BaseTest {
         assertEquals(gpio.topic(), gpioCaptured.topic());
         assertTrue(CollectionUtils.isEmpty(gpio.possibleValues()));
         assertEquals(
-                "Error {There is no possible values for: " + gpio.topic() + "}",
+                "Error occurred during the data processing { There is no possible values for: " + gpio.topic() + " }",
                 gpioCaptured.value()
         );
     }

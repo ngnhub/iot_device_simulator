@@ -36,7 +36,7 @@ public class SensorDataSubscribeService {
     private Flux<SensorData> consumeData(String topic) {
         return Flux.create(sink -> {
             String id = subscribe(topic, new SensorDataListenerImpl(sink));
-            sink.onDispose(() -> publisher.unsubscribe(topic, id));
+            sink.onDispose(() -> unsubscribe(topic, id));
         });
     }
 
@@ -44,6 +44,11 @@ public class SensorDataSubscribeService {
         var id = publisher.subscribe(topic, sensorDataListener);
         log.debug("{} Subscribed on topic {}. Subscriber id: {}", LOG_TAG, topic, id);
         return id;
+    }
+
+    private void unsubscribe(String topic, String id) {
+        publisher.unsubscribe(topic, id);
+        log.debug("{} Unsubscribed from topic {}. Subscriber id: {}", LOG_TAG, topic, id);
     }
 
     private RetryBackoffSpec getRetrySpec() {
