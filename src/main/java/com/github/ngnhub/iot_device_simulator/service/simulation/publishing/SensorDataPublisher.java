@@ -1,12 +1,10 @@
-package com.github.ngnhub.iot_device_simulator.service.simulation;
+package com.github.ngnhub.iot_device_simulator.service.simulation.publishing;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,17 +12,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class SensorDataPublisher {
 
-    private final ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageListeners;
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, SensorDataListener>> topicToMessageListeners;
 
     public void publish(SensorData data) {
-        var topic = data.getTopic();
+        var topic = data.topic();
         topicToMessageListeners.computeIfPresent(topic, (key, consumers) -> fanOut(data, consumers));
     }
 
-    private Map<String, SensorDataListener> fanOut(SensorData data, Map<String, SensorDataListener> consumers) {
+    private ConcurrentHashMap<String, SensorDataListener> fanOut(SensorData data,
+                                                                 ConcurrentHashMap<String, SensorDataListener> consumers) {
         consumers.values().forEach(listener -> {
             listener.onData(data);
-            if (data.isErrored()) {
+            if (data.errored()) {
                 listener.onError(data);
             }
         });
@@ -40,7 +39,7 @@ public class SensorDataPublisher {
     private void addNewConsumer(String topic, String id, SensorDataListener consumer) {
         topicToMessageListeners.compute(topic, (key, queues) -> {
             if (queues == null) {
-                queues = new HashMap<>();
+                queues = new ConcurrentHashMap<>();
             }
             queues.put(id, consumer);
             return queues;

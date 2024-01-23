@@ -1,22 +1,22 @@
 package com.github.ngnhub.iot_device_simulator.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes;
-import jakarta.validation.constraints.NotNull;
+import com.github.ngnhub.iot_device_simulator.utils.SensorValueType;
 import lombok.Builder;
 
 import org.springframework.lang.Nullable;
 
 import java.util.List;
 
-public record SensorDescription(String topic,
-                                SensorValueTypes type,
-                                @Nullable String unitOfMeasure,
+public record SensorDescription(java.lang.String topic,
+                                SensorValueType type,
+                                @Nullable java.lang.String unitOfMeasure,
                                 @Nullable Double min,
                                 @Nullable Double max,
                                 @Nullable List<Object> possibleValues,
                                 @Nullable Integer qos,
-                                @NotNull @JsonProperty("intervalInMillis") Long interval) {
+                                @JsonProperty("intervalInMillis") Long interval,
+                                @Nullable String switcher) {
 
     @Builder(toBuilder = true)
     public SensorDescription {}

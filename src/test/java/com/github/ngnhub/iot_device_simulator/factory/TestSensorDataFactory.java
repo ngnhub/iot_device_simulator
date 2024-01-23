@@ -9,14 +9,21 @@ import java.time.LocalDateTime;
 public class TestSensorDataFactory {
 
     public static final LocalDateTime TEST_SENSOR_TIME = LocalDateTime.of(2025, 1, 1, 0, 0);
-    public static final int TEST_QOS = 2;
 
     public static SensorData getSensorData(String topic, String value) {
         return SensorData.builder()
                 .topic(topic)
-                .sensorData(value)
+                .value(value)
                 .time(TEST_SENSOR_TIME)
-                .qos(TEST_QOS)
+                .build();
+    }
+
+    public static SensorData getErroredData(String topic, String message) {
+        return SensorData.builder()
+                .topic(topic)
+                .value(message)
+                .errored(true)
+                .time(TEST_SENSOR_TIME)
                 .build();
     }
 }

@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.producer.rsocket;
+package com.github.ngnhub.iot_device_simulator.rsocket;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
@@ -23,6 +23,6 @@ public class RSocketSensorDataProducer {
     @MessageMapping("subscribe/value/{topic}")
     public Flux<String> streamValues(@DestinationVariable String topic) {
         return publisher.subscribeOn(topic)
-                .map(SensorData::getSensorData);
+                .map(SensorData::value);
     }
 }

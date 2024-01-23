@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import static com.github.ngnhub.iot_device_simulator.utils.SensorValueTypes.STRING;
+import static com.github.ngnhub.iot_device_simulator.utils.SensorValueType.STRING;
 
 @Component
 @RequiredArgsConstructor
@@ -18,14 +18,17 @@ public class SensorDescriptionValidator {
 
     public void validate(SensorDescription description) {
         jakartaValidator.validate(description);
+        if (description.switcher() != null) {
+            jakartaValidator.validate(description.switcher());
+        }
         validateStringHasPossibleValues(description);
         validatePossibleValuesMatchType(description);
+        validateNotSwitcherAndHastInterval(description);
     }
 
     private void validateStringHasPossibleValues(SensorDescription description) {
         if (STRING == description.type() && CollectionUtils.isEmpty(description.possibleValues())) {
-            throw new ConstraintViolationException(
-                    "Possible values can't be empty for the string type. Topic: " + description.topic(), null);
+            throwError("Possible values can't be empty for the string type. Topic: ", description.topic());
         }
     }
 
@@ -35,11 +38,19 @@ public class SensorDescriptionValidator {
             return;
         }
         values.forEach(val -> {
-            var possibleValueType = val.getClass().getSimpleName();
-            if (!description.type().getTypeSimpleClassName().equals(possibleValueType)) {
-                throw new ConstraintViolationException(
-                        "Possible values have invalid type. Topic: " + description.topic(), null);
+            if (!description.type().getAClass().isInstance(val)) {
+                throwError("Possible values have invalid type. Topic: ", description.topic());
             }
         });
+    }
+
+    private void validateNotSwitcherAndHastInterval(SensorDescription description) {
+        if (description.switcher() == null && description.interval() == null) {
+            throwError("Interval must not be null if not switchable. Topic: ", description.topic());
+        }
+    }
+
+    private void throwError(String message, String topic) {
+        throw new ConstraintViolationException(message + topic, null);
     }
 }

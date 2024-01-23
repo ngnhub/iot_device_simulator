@@ -2,8 +2,8 @@ package com.github.ngnhub.iot_device_simulator.service;
 
 import com.github.ngnhub.iot_device_simulator.config.InternalProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher.SensorDataListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,32 +61,6 @@ class SensorDataSubscribeServiceTest {
                 .expectNext(data1)
                 .expectNext(data2)
                 .expectNext(data3)
-                .verifyComplete();
-        verify(publisher).unsubscribe(topic, keyId);
-    }
-
-    @Test
-    void shouldSendErrorAndUnsubscribeFinallyIfErrored() {
-        // given
-        var topic = "topic";
-        SensorData data1 = getSensorData(topic, "1");
-        SensorData errored = getSensorData(topic, "Error");
-        errored.setErrored(true);
-        var keyId = "id";
-        when(publisher.subscribe(eq(topic), any())).thenAnswer(a -> {
-            SensorDataListener argument = a.getArgument(1);
-            argument.onData(data1);
-            argument.onError(errored);
-            return keyId;
-        });
-
-        // when
-        Flux<SensorData> result = service.subscribeOn(topic);
-
-        // then
-        StepVerifier.create(result)
-                .expectNext(data1)
-                .expectNext(errored)
                 .verifyComplete();
         verify(publisher).unsubscribe(topic, keyId);
     }
@@ -167,12 +141,13 @@ class SensorDataSubscribeServiceTest {
             SensorDataListener argument = a.getArgument(1);
             argument.onData(data1);
             argument.onData(data2);
+            argument.onData(data3);
             argument.onError(data3);
             return keyId;
         });
 
         // when
-        Flux<SensorData> result = service.subscribeOn(topic).take(5);
+        Flux<SensorData> result = service.subscribeOn(topic).take(3);
 
         // then
         StepVerifier.create(result)

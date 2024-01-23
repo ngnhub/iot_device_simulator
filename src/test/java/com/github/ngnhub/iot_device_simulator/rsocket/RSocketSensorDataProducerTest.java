@@ -1,4 +1,4 @@
-package com.github.ngnhub.iot_device_simulator.producer.rsocket;
+package com.github.ngnhub.iot_device_simulator.rsocket;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import org.junit.jupiter.api.Test;
@@ -60,8 +60,8 @@ class RSocketSensorDataProducerTest {
         var gpio = gpio();
         var possibleValues = gpio.possibleValues();
         assertFalse(CollectionUtils.isEmpty(possibleValues));
-        return val.getTopic().equals("gpio")
-                && possibleValues.contains(val.getSensorData());
+        return val.topic().equals("gpio")
+                && possibleValues.contains(val.value());
     }
 
     @Test

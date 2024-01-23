@@ -1,7 +1,6 @@
-package com.github.ngnhub.iot_device_simulator.service;
+package com.github.ngnhub.iot_device_simulator.service.simulation;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +9,7 @@ import reactor.test.StepVerifier;
 
 import java.io.IOException;
 
+import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.fan;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.gpio;
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.temperature;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,31 +27,6 @@ class SensorDescriptionStorageTest extends BaseTest {
     }
 
     @Test
-    void shouldReturnGpioDescription() {
-        // given
-        var expected = gpio();
-
-        // when
-        var actual = sensorDescriptionStorage.getBy("gpio").block();
-
-        // then
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void shouldThrowsWhenSensorDoesNotExist() {
-        // when
-        var exc =
-                assertThrows(
-                        IllegalArgumentException.class,
-                        () -> sensorDescriptionStorage.getBy("not existed").block()
-                );
-
-        // then
-        assertEquals("Sensor is not found: not existed", exc.getMessage());
-    }
-
-    @Test
     void shouldReturnAllFromJsonFile() {
         // when
         var actual = sensorDescriptionStorage.getAll();
@@ -59,21 +34,11 @@ class SensorDescriptionStorageTest extends BaseTest {
         // then
         var gpio = gpio();
         var temperature = temperature();
+        var fan = fan();
         StepVerifier.create(actual)
+                .expectNext(fan)
                 .expectNext(temperature)
                 .expectNext(gpio)
-                .verifyComplete();
-    }
-
-    @Test
-    void shouldReturnAllTopics() {
-        // when
-        var actual = sensorDescriptionStorage.getAllTopics();
-
-        // then
-        StepVerifier.create(actual)
-                .expectNext("temperature")
-                .expectNext("gpio")
                 .verifyComplete();
     }
 }

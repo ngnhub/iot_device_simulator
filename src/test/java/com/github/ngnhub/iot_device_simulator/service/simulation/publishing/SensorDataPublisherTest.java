@@ -1,16 +1,14 @@
-package com.github.ngnhub.iot_device_simulator.service;
+package com.github.ngnhub.iot_device_simulator.service.simulation.publishing;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.UUIDVerifier;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher.SensorDataListener;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFactory.getSensorData;
@@ -26,7 +24,7 @@ import static org.mockito.Mockito.verify;
 class SensorDataPublisherTest extends BaseTest {
 
     @Spy
-    private ConcurrentHashMap<String, Map<String, SensorDataListener>> topicToMessageQueues = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, ConcurrentHashMap<String, SensorDataListener>> topicToMessageQueues = new ConcurrentHashMap<>();
     private SensorDataPublisher publisher;
 
     @BeforeEach
@@ -39,10 +37,10 @@ class SensorDataPublisherTest extends BaseTest {
         // given
         var topic = "topic";
         var data = getSensorData(topic, "on");
-        Map<String, SensorDataListener> queues = new HashMap<>();
+        ConcurrentHashMap<String, SensorDataListener> queues = new ConcurrentHashMap<>();
         var key1 = "key1";
         var key2 = "key2";
-        SensorDataListener consumer1 = spy(new TestSensorDataListener());
+        SensorDataListener consumer1 = Mockito.spy(new TestSensorDataListener());
         SensorDataListener consumer2 = spy(new TestSensorDataListener());
         queues.put(key1, consumer1);
         queues.put(key2, consumer2);
@@ -60,9 +58,8 @@ class SensorDataPublisherTest extends BaseTest {
     void shouldSendErrored() {
         // given
         var topic = "topic";
-        var data = getSensorData(topic, "on");
-        data.setErrored(true);
-        Map<String, SensorDataListener> queues = new HashMap<>();
+        var data = getSensorData(topic, "on").toBuilder().errored(true).build();
+        ConcurrentHashMap<String, SensorDataListener> queues = new ConcurrentHashMap<>();
         var key1 = "key1";
         var key2 = "key2";
         SensorDataListener consumer1 = spy(new TestSensorDataListener());
@@ -99,9 +96,9 @@ class SensorDataPublisherTest extends BaseTest {
         var topic = "topic";
         var subscriberId = "id";
         SensorDataListener consumer = spy(new TestSensorDataListener());
-        Map<String, SensorDataListener> map = new HashMap<>();
-        map.put(subscriberId, consumer);
-        topicToMessageQueues.put(topic, map);
+        ConcurrentHashMap<String, SensorDataListener> queues = new ConcurrentHashMap<>();
+        queues.put(subscriberId, consumer);
+        topicToMessageQueues.put(topic, queues);
         assertTrue(topicToMessageQueues.get(topic).containsKey(subscriberId));
 
         // when

@@ -8,10 +8,16 @@
   {
     "topic": "temperature",
     "type": "DOUBLE",
-    "unitOfMeasure" : "C",
+    "unitOfMeasure": "C",
     "min": -50,
     "max": 100,
     "qos": 1,
     "intervalInMillis": 100
+  },
+  {
+    "topic": "fan",
+    "type": "DOUBLE",
+    "switcher": "fan/state",
+    "possibleValues": [1.0, 0.0]
   }
 ]

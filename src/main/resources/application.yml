@@ -10,7 +10,6 @@ mqtt:
   port: 1883
   username: 'admin'
   password: 'admin'
-  enable-topic-unique-ids: true
 
 internal:
   subscriber:

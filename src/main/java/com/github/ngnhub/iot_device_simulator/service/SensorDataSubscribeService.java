@@ -2,8 +2,8 @@ package com.github.ngnhub.iot_device_simulator.service;
 
 import com.github.ngnhub.iot_device_simulator.config.InternalProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher;
-import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDataPublisher.SensorDataListener;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher.SensorDataListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Exceptions;
@@ -36,7 +36,7 @@ public class SensorDataSubscribeService {
     private Flux<SensorData> consumeData(String topic) {
         return Flux.create(sink -> {
             String id = subscribe(topic, new SensorDataListenerImpl(sink));
-            sink.onDispose(() -> publisher.unsubscribe(topic, id));
+            sink.onDispose(() -> unsubscribe(topic, id));
         });
     }
 
@@ -44,6 +44,11 @@ public class SensorDataSubscribeService {
         var id = publisher.subscribe(topic, sensorDataListener);
         log.debug("{} Subscribed on topic {}. Subscriber id: {}", LOG_TAG, topic, id);
         return id;
+    }
+
+    private void unsubscribe(String topic, String id) {
+        publisher.unsubscribe(topic, id);
+        log.debug("{} Unsubscribed from topic {}. Subscriber id: {}", LOG_TAG, topic, id);
     }
 
     private RetryBackoffSpec getRetrySpec() {
@@ -66,8 +71,7 @@ public class SensorDataSubscribeService {
 
         @Override
         public void onError(SensorData data) {
-            dataFluxSink.next(data);
-            dataFluxSink.complete();
+            log.error("Errored data consumed: {}", data.toString());
         }
     }
 }
