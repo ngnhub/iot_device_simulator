@@ -2,7 +2,7 @@ package com.github.ngnhub.iot_device_simulator.service.simulation.consuming;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
-import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisherImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class SensorDataSwitcherTest {
+class SensorDataSwitcherImplTest {
 
     private ConcurrentHashMap<String, SensorDescription> topicToDescription;
     @Mock
-    private SensorDataPublisher publisher;
+    private SensorDataPublisherImpl publisher;
     @Captor
     private ArgumentCaptor<SensorData> dataArgumentCaptor;
     private SensorDataSwitcher switcher;
@@ -35,7 +35,7 @@ class SensorDataSwitcherTest {
     @BeforeEach
     void setUp() {
         topicToDescription = new ConcurrentHashMap<>();
-        switcher = new SensorDataSwitcher(topicToDescription, publisher);
+        switcher = new SensorDataSwitcherImpl(topicToDescription, publisher);
     }
 
     @Test
