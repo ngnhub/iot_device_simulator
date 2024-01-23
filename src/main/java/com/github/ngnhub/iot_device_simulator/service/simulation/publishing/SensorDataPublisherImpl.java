@@ -1,7 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.service.simulation.publishing;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
@@ -40,13 +39,13 @@ public class SensorDataPublisherImpl implements SensorDataPublisher {
     }
 
     private void addNewConsumer(String topic, String id, SensorDataListener consumer) {
-        topicToMessageListeners.compute(topic, (key, queues) -> {
-            if (queues == null) {
-                queues = new ConcurrentHashMap<>();
-            }
-            queues.put(id, consumer);
-            return queues;
-        });
+        topicToMessageListeners.computeIfPresent(
+                topic,
+                (key, queues) -> {
+                    queues.put(id, consumer);
+                    return queues;
+                }
+        );
     }
 
     @Override

@@ -13,8 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFactory.getSensorData;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -77,7 +77,7 @@ class SensorDataPublisherImplTest extends BaseTest {
     }
 
     @Test
-    void shouldAddNewMapToTopic() {
+    void shouldNotAddNewMapToTopic() {
         // given
         var topic = "topic";
         SensorDataListener consumer = spy(new TestSensorDataListener());
@@ -87,7 +87,7 @@ class SensorDataPublisherImplTest extends BaseTest {
 
         // then
         assertTrue(UUIDVerifier.isUUID(key));
-        assertEquals(topicToMessageQueues.get(topic).get(key), consumer);
+        assertNull(topicToMessageQueues.get(topic));
     }
 
     @Test
@@ -112,6 +112,7 @@ class SensorDataPublisherImplTest extends BaseTest {
     void shouldSubscribeUnsubscribeAndSubscribeSuccessfully() {
         // given
         var topic = "topic";
+        topicToMessageQueues.put(topic, new ConcurrentHashMap<>());
         var data = getSensorData(topic, "on");
         SensorDataListener consumer = spy(new TestSensorDataListener());
 
