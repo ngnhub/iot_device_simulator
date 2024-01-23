@@ -19,7 +19,6 @@ import java.util.Random;
 
 import static com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory.create;
 
-// TODO: 22.01.2024 round double
 @Slf4j
 @Service
 @RequiredArgsConstructor
