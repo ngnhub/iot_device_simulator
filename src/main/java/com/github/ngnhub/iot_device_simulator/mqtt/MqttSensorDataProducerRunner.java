@@ -22,9 +22,9 @@ import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_CL
 import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST;
 
 @Slf4j
-@ConditionalOnBean(MqttSensorDataProducer.class)
 @Component
 @RequiredArgsConstructor
+@ConditionalOnBean(MqttClient.class)
 public class MqttSensorDataProducerRunner {
 
     private static final Set<Integer> RETRIABLE_REASONS = Set.of(

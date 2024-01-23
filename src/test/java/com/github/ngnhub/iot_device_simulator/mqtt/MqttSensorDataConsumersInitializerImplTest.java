@@ -1,6 +1,7 @@
 package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
+import com.github.ngnhub.iot_device_simulator.mqtt.impl.MqttSensorDataConsumersInitializerImpl;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import com.github.ngnhub.iot_device_simulator.service.simulation.consuming.SensorDataSwitcher;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -20,13 +21,11 @@ import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFacto
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.fan;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MqttSensorDataConsumersInitializerTest {
+class MqttSensorDataConsumersInitializerImplTest {
 
     @Mock
     private MqttClient mqttClient;
@@ -34,12 +33,12 @@ class MqttSensorDataConsumersInitializerTest {
     private SensorDataSwitcher switcher;
     @Mock
     private SensorDescriptionStorage storage;
-    private MqttSensorDataConsumersInitializer initializer;
+    private MqttSensorDataConsumersInitializerImpl initializer;
 
 
     @BeforeEach
     void setUp() {
-        initializer = new MqttSensorDataConsumersInitializer(
+        initializer = new MqttSensorDataConsumersInitializerImpl(
                 mqttClient,
                 switcher,
                 storage

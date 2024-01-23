@@ -3,7 +3,7 @@ package com.github.ngnhub.iot_device_simulator.mqtt;
 import com.github.ngnhub.iot_device_simulator.BaseTest;
 import com.github.ngnhub.iot_device_simulator.config.MqttProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
-import com.github.ngnhub.iot_device_simulator.mqtt.MqttSensorDataProducer;
+import com.github.ngnhub.iot_device_simulator.mqtt.impl.MqttSensorDataProducerImpl;
 import com.github.ngnhub.iot_device_simulator.service.SensorDataSubscribeService;
 import com.github.ngnhub.iot_device_simulator.service.simulation.SensorDescriptionStorage;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -26,12 +26,12 @@ import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class MqttSensorDataProducerTest extends BaseTest {
+class MqttSensorDataProducerImplTest extends BaseTest {
 
     private static final String UUID_PATTERN = "([0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12})";
 
     @Mock
-    private SensorDataSubscribeService sensorDataSubscribeService;
+    private SensorDataSubscribeService sensorDataSubscribeServiceImpl;
     @Mock
     private SensorDescriptionStorage storage;
     @Mock
@@ -39,12 +39,12 @@ class MqttSensorDataProducerTest extends BaseTest {
     @Captor
     private ArgumentCaptor<MqttMessage> mqttMessageArgumentCaptor;
     private MqttProps props;
-    private MqttSensorDataProducer producer;
+    private MqttSensorDataProducerImpl producer;
 
     @BeforeEach
     void setUp() {
         props = new MqttProps();
-        producer = new MqttSensorDataProducer(sensorDataSubscribeService, storage, mqttClient, props);
+        producer = new MqttSensorDataProducerImpl(sensorDataSubscribeServiceImpl, storage, mqttClient, props);
     }
 
     @Test
@@ -58,8 +58,8 @@ class MqttSensorDataProducerTest extends BaseTest {
         when(storage.getAll()).thenReturn(Flux.just(gpio, temperature));
         var gpioData = getSensorData(gpioTopic, "1");
         var temperatureData = getSensorData(temperatureTopic, "15");
-        when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
-        when(sensorDataSubscribeService.subscribeOn(temperatureTopic)).thenReturn(Flux.just(temperatureData));
+        when(sensorDataSubscribeServiceImpl.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
+        when(sensorDataSubscribeServiceImpl.subscribeOn(temperatureTopic)).thenReturn(Flux.just(temperatureData));
 
         // when
         Flux<Void> flux = producer.initProduce().take(2);
@@ -89,7 +89,7 @@ class MqttSensorDataProducerTest extends BaseTest {
 
         when(storage.getAll()).thenReturn(Flux.just(gpio));
         var gpioData = getSensorData(gpioTopic, "1");
-        when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
+        when(sensorDataSubscribeServiceImpl.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
         Flux<Void> flux = producer.initProduce().take(1);
@@ -108,7 +108,7 @@ class MqttSensorDataProducerTest extends BaseTest {
 
         when(storage.getAll()).thenReturn(Flux.just(gpio));
         var gpioData = getSensorData(gpioTopic, "1");
-        when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
+        when(sensorDataSubscribeServiceImpl.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
         Flux<Void> flux = producer.initProduce().take(1);
@@ -130,7 +130,7 @@ class MqttSensorDataProducerTest extends BaseTest {
 
         when(storage.getAll()).thenReturn(Flux.just(gpio));
         var gpioData = getSensorData(gpioTopic, "1");
-        when(sensorDataSubscribeService.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
+        when(sensorDataSubscribeServiceImpl.subscribeOn(gpioTopic)).thenReturn(Flux.just(gpioData));
 
         // when
         Flux<Void> flux = producer.initProduce().take(1);

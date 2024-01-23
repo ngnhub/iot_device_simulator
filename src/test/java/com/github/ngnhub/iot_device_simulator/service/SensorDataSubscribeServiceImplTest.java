@@ -2,8 +2,8 @@ package com.github.ngnhub.iot_device_simulator.service;
 
 import com.github.ngnhub.iot_device_simulator.config.InternalProps;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
-import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher.SensorDataListener;
+import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisherImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,11 +21,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SensorDataSubscribeServiceTest {
+class SensorDataSubscribeServiceImplTest {
 
     @Mock
-    private SensorDataPublisher publisher;
-    private SensorDataSubscribeService service;
+    private SensorDataPublisherImpl publisher;
+    private SensorDataSubscribeServiceImpl service;
 
     @BeforeEach
     void setUp() {
@@ -34,7 +34,7 @@ class SensorDataSubscribeServiceTest {
         subscriber.setRetryDelayMillis(1000L);
         InternalProps internalProps = new InternalProps();
         internalProps.setSubscriber(subscriber);
-        service = new SensorDataSubscribeService(publisher, internalProps);
+        service = new SensorDataSubscribeServiceImpl(publisher, internalProps);
     }
 
     @Test

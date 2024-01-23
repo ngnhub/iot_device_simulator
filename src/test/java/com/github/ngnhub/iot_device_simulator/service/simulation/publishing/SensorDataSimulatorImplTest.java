@@ -29,21 +29,21 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class SensorDataSimulatorTest extends BaseTest {
+class SensorDataSimulatorImplTest extends BaseTest {
 
     private static final VirtualTimeScheduler SCHEDULER = VirtualTimeScheduler.getOrSet();
 
     @Mock
     private SensorDescriptionStorage storage;
     @Mock
-    private SensorDataPublisher datPublisher;
+    private SensorDataPublisherImpl datPublisher;
     @Captor
     private ArgumentCaptor<SensorData> eventArgumentCaptor;
-    private SensorDataSimulator simulator;
+    private SensorDataSimulatorImpl simulator;
 
     @BeforeEach
     void setUp() {
-        simulator = new SensorDataSimulator(storage, datPublisher);
+        simulator = new SensorDataSimulatorImpl(storage, datPublisher);
     }
 
     @AfterAll

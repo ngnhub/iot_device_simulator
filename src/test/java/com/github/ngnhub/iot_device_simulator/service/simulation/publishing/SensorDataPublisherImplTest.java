@@ -21,7 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @Slf4j
-class SensorDataPublisherTest extends BaseTest {
+class SensorDataPublisherImplTest extends BaseTest {
 
     @Spy
     private ConcurrentHashMap<String, ConcurrentHashMap<String, SensorDataListener>> topicToMessageQueues = new ConcurrentHashMap<>();
@@ -29,7 +29,7 @@ class SensorDataPublisherTest extends BaseTest {
 
     @BeforeEach
     void setUp() {
-        publisher = new SensorDataPublisher(topicToMessageQueues);
+        publisher = new SensorDataPublisherImpl(topicToMessageQueues);
     }
 
     @Test

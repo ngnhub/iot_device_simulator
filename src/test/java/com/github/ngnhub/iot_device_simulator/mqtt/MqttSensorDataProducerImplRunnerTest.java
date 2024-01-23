@@ -1,6 +1,8 @@
 package com.github.ngnhub.iot_device_simulator.mqtt;
 
 import com.github.ngnhub.iot_device_simulator.BaseTest;
+import com.github.ngnhub.iot_device_simulator.mqtt.impl.MqttSensorDataConsumersInitializerImpl;
+import com.github.ngnhub.iot_device_simulator.mqtt.impl.MqttSensorDataProducerImpl;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -24,14 +26,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-class MqttSensorDataProducerRunnerTest extends BaseTest {
+class MqttSensorDataProducerImplRunnerTest extends BaseTest {
 
     private static final VirtualTimeScheduler SCHEDULER = VirtualTimeScheduler.getOrSet();
 
     @Mock
-    private MqttSensorDataProducer producer;
+    private MqttSensorDataProducerImpl producer;
     @Mock
-    private MqttSensorDataConsumersInitializer consumer;
+    private MqttSensorDataConsumersInitializerImpl consumer;
     @Mock
     private MqttConnectOptions options;
     @Mock
