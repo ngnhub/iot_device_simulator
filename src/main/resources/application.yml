@@ -4,7 +4,7 @@ spring:
       port: 7070
 
 #todo all props from variable
-sensor-descriptor-path: 'classpath:default_sensors.json'
+
 mqtt:
   host: 'localhost'
   port: 1883
@@ -19,3 +19,6 @@ internal:
 logging:
   level:
     com.github.ngnhub.iot_device_simulator: debug
+
+description:
+  default-resource: 'default_sensors.json'

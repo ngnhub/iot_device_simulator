@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ResourceUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -20,13 +19,20 @@ import java.util.stream.Collectors;
 public class SensorDescriptionStorageConfig {
 
     @Bean
-    public Map<String, SensorDescription> descriptions(@Value("${sensor-descriptor-path}") String descriptorPath,
+    public Map<String, SensorDescription> descriptions(SensorDescriptionProps props,
                                                        SensorDescriptionValidator validator) throws IOException {
-        var file = ResourceUtils.getFile(descriptorPath);
-        var mapper = new ObjectMapper();
-        List<SensorDescription> descriptionList = mapper.readValue(file, new TypeReference<>() {});
-        descriptionList.forEach(validator::validate);
-        return descriptionList.stream()
+        return getDescriptionFile(props).stream()
+                .peek(validator::validate)
                 .collect(Collectors.toMap(SensorDescription::topic, Function.identity()));
+    }
+
+    private List<SensorDescription> getDescriptionFile(SensorDescriptionProps props) throws IOException {
+        var mapper = new ObjectMapper();
+        if (props.getPath() == null) {
+            var stream = getClass().getClassLoader().getResourceAsStream(props.getDefaultResource());
+            return mapper.readValue(stream, new TypeReference<>() {});
+        }
+        var file = new File(props.getPath());
+        return mapper.readValue(file, new TypeReference<>() {});
     }
 }
