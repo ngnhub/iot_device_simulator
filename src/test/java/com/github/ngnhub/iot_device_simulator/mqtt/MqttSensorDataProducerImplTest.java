@@ -97,7 +97,7 @@ class MqttSensorDataProducerImplTest extends BaseTest {
 
         // then
         StepVerifier.create(flux).verifyComplete();
-        verify(mqttClient).publish(eq(basePath + "/" + gpioTopic), any());
+        verify(mqttClient).publish(eq(basePath + gpioTopic), any());
     }
 
     @Test
@@ -138,7 +138,6 @@ class MqttSensorDataProducerImplTest extends BaseTest {
 
         // then
         StepVerifier.create(flux).verifyComplete();
-
-        verify(mqttClient).publish(matches("^" + basePath + "/" + UUID_PATTERN + "/gpio$"), any());
+        verify(mqttClient).publish(matches("^" + basePath + UUID_PATTERN + "/gpio$"), any());
     }
 }

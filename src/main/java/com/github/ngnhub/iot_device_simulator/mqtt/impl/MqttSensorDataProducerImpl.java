@@ -71,7 +71,7 @@ public class MqttSensorDataProducerImpl implements MqttSensorDataProducer {
         if (ObjectUtils.isEmpty(topicBasePath)) {
             return sensor;
         }
-        return String.format("%s/%s", topicBasePath, sensor);
+        return String.format("%s%s", topicBasePath, sensor);
     }
 
     private String generateUniqueTopic(String sensor, String topicBasePath) {
@@ -79,7 +79,7 @@ public class MqttSensorDataProducerImpl implements MqttSensorDataProducer {
         if (ObjectUtils.isEmpty(topicBasePath)) {
             return String.format("%s/%s", messageId, sensor);
         }
-        return String.format("%s/%s/%s", topicBasePath, messageId, sensor);
+        return String.format("%s%s/%s", topicBasePath, messageId, sensor);
     }
 
     private byte[] convertValue(Object value) {
