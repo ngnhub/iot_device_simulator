@@ -22,4 +22,5 @@ public class MqttProps {
     private String topicBasePath;
     private boolean enableTopicUniqueIds;
     private Integer qos = 2;
+    private Integer reconnectionDelay;
 }
