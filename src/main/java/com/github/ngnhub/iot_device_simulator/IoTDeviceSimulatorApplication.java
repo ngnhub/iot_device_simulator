@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 // TODO: 24.01.2024 dockerhub pub
-// TODO: 24.01.2024 remove basepath slash requirement
 // TODO: 18.01.2024 github version
 @SpringBootApplication
 public class IoTDeviceSimulatorApplication {
