@@ -1,5 +1,6 @@
 package com.github.ngnhub.iot_device_simulator.service.simulation.consuming;
 
+import com.github.ngnhub.iot_device_simulator.error.NotFoundException;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
 import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisherImpl;
@@ -20,6 +21,8 @@ import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDataFacto
 import static com.github.ngnhub.iot_device_simulator.factory.TestSensorDescriptionFactory.fan;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +62,6 @@ class SensorDataSwitcherImplTest {
     void shouldSendErrorMessageIfTopicDoesNotExist() {
         // given
         assertTrue(topicToDescription.isEmpty());
-        var expectedMessage = "Error occurred during the data processing { Topic does not exist or is not switchable }";
         byte[] bytes = String.valueOf(1.0).getBytes();
 
         // when
@@ -67,10 +69,10 @@ class SensorDataSwitcherImplTest {
 
         // then
         StepVerifier.create(monoData)
-                .expectNextMatches(data -> data.errored() && expectedMessage.equals(data.value()))
-                .verifyComplete();
+                .verifyErrorMatches(err -> err instanceof NotFoundException
+                        && "Topic does not exist or is not switchable: test_topic".equals(err.getMessage()));
         assertTrue(topicToDescription.isEmpty());
-        verifyErroredDataIsPublished(getErroredData("test_topic", expectedMessage));
+        verify(publisher, never()).publish(any());
     }
 
     @Test
@@ -89,7 +91,7 @@ class SensorDataSwitcherImplTest {
         StepVerifier.create(monoData)
                 .expectNextMatches(data -> data.errored() && expectedMessage.equals(data.value()))
                 .verifyComplete();
-        verifyErroredDataIsPublished(getErroredData(fan.switcher(), expectedMessage));
+        verifyErroredDataIsPublished(getErroredData(fan.topic(), expectedMessage));
     }
 
     @Test
@@ -107,7 +109,7 @@ class SensorDataSwitcherImplTest {
         StepVerifier.create(monoData)
                 .expectNextMatches(data -> data.errored() && expectedMessage.equals(data.value()))
                 .verifyComplete();
-        verifyErroredDataIsPublished(getErroredData(fan.switcher(), expectedMessage));
+        verifyErroredDataIsPublished(getErroredData(fan.topic(), expectedMessage));
     }
 
     private void verifyErroredDataIsPublished(SensorData expected) {

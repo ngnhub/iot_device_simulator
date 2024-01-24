@@ -4,7 +4,6 @@ import com.github.ngnhub.iot_device_simulator.error.NotFoundException;
 import com.github.ngnhub.iot_device_simulator.mapper.SensorDataFactory;
 import com.github.ngnhub.iot_device_simulator.model.SensorData;
 import com.github.ngnhub.iot_device_simulator.model.SensorDescription;
-import com.github.ngnhub.iot_device_simulator.service.simulation.consuming.SensorDataSwitcher;
 import com.github.ngnhub.iot_device_simulator.service.simulation.publishing.SensorDataPublisher;
 import com.github.ngnhub.iot_device_simulator.utils.SensorValueType;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +26,12 @@ public class SensorDataSwitcherImpl implements SensorDataSwitcher {
     private final SensorDataPublisher publisher;
 
     @Override
-    public Mono<SensorData> switchOn(String topic, byte[] payload) {
-        return Mono.fromSupplier(() -> switcherTopicToDescription.get(topic))
-                .switchIfEmpty(Mono.error(() -> new NotFoundException("Topic does not exist or is not switchable")))
+    public Mono<SensorData> switchOn(String switcherTopic, byte[] payload) {
+        return Mono.fromSupplier(() -> switcherTopicToDescription.get(switcherTopic))
+                .switchIfEmpty(Mono.error(() -> new NotFoundException("Topic does not exist or is not switchable: " + switcherTopic)))
                 .flatMap(description -> convert(payload, description.type())
-                        .map(value -> switchAndGet(description, value)))
-                .onErrorResume((err) -> computeError(topic, (Exception) err))
+                        .map(value -> switchAndGet(description, value))
+                        .onErrorResume((err) -> computeError(description.topic(), (Exception) err)))
                 .doOnNext(publisher::publish);
     }
 
