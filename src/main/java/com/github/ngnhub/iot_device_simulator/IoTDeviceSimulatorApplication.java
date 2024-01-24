@@ -4,8 +4,10 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
-// TODO: 11.01.2024 docker image
+// TODO: 24.01.2024 github pub
+// TODO: 24.01.2024 remove basepath slash requirement
 // TODO: 18.01.2024 github version
+// TODO: 24.01.2024 volume for sensors
 @SpringBootApplication
 public class IoTDeviceSimulatorApplication {
 

@@ -41,7 +41,7 @@ public class MqttClientConfig {
             options.setPassword(password.toCharArray());
         }
         var reconnectionDelay = props.getReconnectionDelay();
-        if (!ObjectUtils.isEmpty(reconnectionDelay)) {
+        if (reconnectionDelay != -1) {
             options.setMaxReconnectDelay(reconnectionDelay);
         }
         options.setAutomaticReconnect(true);
