@@ -1,7 +1,7 @@
 spring:
   rsocket:
     server:
-      port: ${APP_PORTS:7070}
+      port: ${RSOCKET_PORTS:7070}
 
 mqtt:
   host: ${MQTT_HOST:localhost}

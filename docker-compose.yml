@@ -13,4 +13,4 @@ services:
     environment:
       - MQTT_HOST=mosquitto
     ports:
-      - '7070:8080'
+      - '7070:7070'

@@ -1,0 +1,5 @@
+mqtt:
+  host: ${MQTT_HOST:localhost}
+
+description:
+  path: /app/sensors/sensors.json
