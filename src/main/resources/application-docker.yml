@@ -1,5 +1,5 @@
 mqtt:
-  host: ${MQTT_HOST:localhost}
+  host: ${MQTT_HOST:host.docker.internal}
 
 description:
   path: /app/sensors/sensors.json
