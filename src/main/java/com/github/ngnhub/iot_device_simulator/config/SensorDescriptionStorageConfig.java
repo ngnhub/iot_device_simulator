@@ -7,6 +7,7 @@ import com.github.ngnhub.iot_device_simulator.utils.SensorDescriptionValidator;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ObjectUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class SensorDescriptionStorageConfig {
 
     private List<SensorDescription> getDescriptionFile(SensorDescriptionProps props) throws IOException {
         var mapper = new ObjectMapper();
-        if (props.getPath() == null) {
+        if (ObjectUtils.isEmpty(props.getPath())) {
             var stream = getClass().getClassLoader().getResourceAsStream(props.getDefaultResource());
             return mapper.readValue(stream, new TypeReference<>() {});
         }

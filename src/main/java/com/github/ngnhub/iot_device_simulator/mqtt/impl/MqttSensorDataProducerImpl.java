@@ -16,6 +16,7 @@ import reactor.core.scheduler.Schedulers;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.UUID;
 
@@ -67,7 +68,7 @@ public class MqttSensorDataProducerImpl implements MqttSensorDataProducer {
     }
 
     private String generateCommonTopic(String sensor, String topicBasePath) {
-        if (topicBasePath == null) {
+        if (ObjectUtils.isEmpty(topicBasePath)) {
             return sensor;
         }
         return String.format("%s/%s", topicBasePath, sensor);
@@ -75,7 +76,7 @@ public class MqttSensorDataProducerImpl implements MqttSensorDataProducer {
 
     private String generateUniqueTopic(String sensor, String topicBasePath) {
         var messageId = UUID.randomUUID();
-        if (topicBasePath == null) {
+        if (ObjectUtils.isEmpty(topicBasePath)) {
             return String.format("%s/%s", messageId, sensor);
         }
         return String.format("%s/%s/%s", topicBasePath, messageId, sensor);
