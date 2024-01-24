@@ -1,9 +1,9 @@
 [
   {
-    "topic": "gpio1",
+    "topic": "gpio",
     "type": "DOUBLE",
     "possibleValues": [1.0, 0.0],
-    "switcher": "gpio1/state"
+    "switcher": "gpio/state"
   },
   {
     "topic": "temperature",
