@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    ports:
+      - '1883:1883'
+    volumes:
+      - /path/to/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  simulator:
+    image: device-simulator
+    environment:
+      - MQTT_HOST=mosquitto
+    ports:
+      - '7070:8080'
