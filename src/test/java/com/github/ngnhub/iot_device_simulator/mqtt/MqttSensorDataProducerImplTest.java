@@ -44,6 +44,7 @@ class MqttSensorDataProducerImplTest extends BaseTest {
     @BeforeEach
     void setUp() {
         props = new MqttProps();
+        props.setQos(2);
         producer = new MqttSensorDataProducerImpl(sensorDataSubscribeServiceImpl, storage, mqttClient, props);
     }
 

@@ -5,6 +5,7 @@ spring:
 
 mqtt:
   enabled: false
+  qos: 2
 
 internal:
   subscriber:
