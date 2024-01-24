@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  mqtt:
+    image: eclipse-mosquitto:latest
+    ports:
+      - '1883:1883'
+    volumes:
+      # The following mounting is required if you want to use docker network communication.
+      # The default config does not allow outside  connections.
+      - /path/to/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  simulator:
+    image: device-simulator
+    ports:
+      - '7070:7070'
+#    volumes:
+#      - /path/to/sensors.json:/app/sensors/sensors.json

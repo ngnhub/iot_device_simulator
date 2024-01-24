@@ -1,15 +1,17 @@
 spring:
   rsocket:
     server:
-      port: 7070
+      port: ${RSOCKET_PORTS:7070}
 
-#todo all props from variable
-sensor-descriptor-path: 'classpath:default_sensors.json'
 mqtt:
-  host: 'localhost'
-  port: 1883
-  username: 'admin'
-  password: 'admin'
+  host: ${MQTT_HOST:localhost}
+  port: ${MQTT_PORT:1883}
+  username: ${MQTT_USERNAME:}
+  password: ${MQTT_PASSWORD:}
+  qos: ${MQTT_QOS:2}
+  reconnection-delay: ${MQTT_RECONNECTION_DELAY:-1}
+  topic-base-path: ${MQTT_TOPIC_BASE_PATH:}
+  enable-topic-unique-ids: ${MQTT_UNIQUE_TOPICS_ENABLED:false}
 
 internal:
   subscriber:
@@ -18,4 +20,8 @@ internal:
 
 logging:
   level:
-    com.github.ngnhub.iot_device_simulator: debug
+    com.github.ngnhub.iot_device_simulator: ${LOG_LEVEL:info}
+
+description:
+  default-resource: 'default_sensors.json'
+  path: ${SENSORS_DESCRIPTION_PATH:}

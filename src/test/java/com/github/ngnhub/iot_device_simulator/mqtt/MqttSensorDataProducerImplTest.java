@@ -44,6 +44,7 @@ class MqttSensorDataProducerImplTest extends BaseTest {
     @BeforeEach
     void setUp() {
         props = new MqttProps();
+        props.setQos(2);
         producer = new MqttSensorDataProducerImpl(sensorDataSubscribeServiceImpl, storage, mqttClient, props);
     }
 
@@ -96,7 +97,7 @@ class MqttSensorDataProducerImplTest extends BaseTest {
 
         // then
         StepVerifier.create(flux).verifyComplete();
-        verify(mqttClient).publish(eq(basePath + "/" + gpioTopic), any());
+        verify(mqttClient).publish(eq(basePath + gpioTopic), any());
     }
 
     @Test
@@ -137,7 +138,6 @@ class MqttSensorDataProducerImplTest extends BaseTest {
 
         // then
         StepVerifier.create(flux).verifyComplete();
-
-        verify(mqttClient).publish(matches("^" + basePath + "/" + UUID_PATTERN + "/gpio$"), any());
+        verify(mqttClient).publish(matches("^" + basePath + UUID_PATTERN + "/gpio$"), any());
     }
 }

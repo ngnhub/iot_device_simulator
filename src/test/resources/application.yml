@@ -2,15 +2,18 @@ spring:
   rsocket:
     server:
       port: 7071
-sensor-descriptor-path: 'classpath:test_sensors.json'
 
 mqtt:
   enabled: false
+  qos: 2
 
 internal:
   subscriber:
     retry-attempts: 1
     retry-delay-millis: 100
+
+description:
+  default-resource: 'test_sensors.json'
 
 logging:
   level:

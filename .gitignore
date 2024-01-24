@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Spring ###
+src/main/resources/application-local.yml
+
+### Docker ###
+docker-compose-local.yml

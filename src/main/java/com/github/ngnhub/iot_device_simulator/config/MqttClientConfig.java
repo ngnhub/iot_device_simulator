@@ -9,6 +9,7 @@ import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ObjectUtils;
 
 import java.util.UUID;
 
@@ -31,13 +32,16 @@ public class MqttClientConfig {
     @Bean
     public MqttConnectOptions mqttOptions(MqttProps props) {
         var options = new MqttConnectOptions();
-        options.setUserName(props.getUsername());
+        var username = props.getUsername();
+        if (!ObjectUtils.isEmpty(username)) {
+            options.setUserName(props.getUsername());
+        }
         var password = props.getPassword();
-        if (password != null) {
+        if (!ObjectUtils.isEmpty(password)) {
             options.setPassword(password.toCharArray());
         }
         var reconnectionDelay = props.getReconnectionDelay();
-        if (reconnectionDelay != null) {
+        if (reconnectionDelay != -1) {
             options.setMaxReconnectDelay(reconnectionDelay);
         }
         options.setAutomaticReconnect(true);
