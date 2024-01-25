@@ -39,8 +39,8 @@ public class SensorDataSwitcherImpl implements SensorDataSwitcher {
         return Mono.defer(() -> type.getFromByteConverter()
                 .apply(payload)
                 .map(Mono::just)
-                .orElseThrow(() -> new IllegalArgumentException("Can not convert consumed value. Should have type: "
-                                                                        + type.getAClass())));
+                .orElseThrow(() -> new IllegalArgumentException("Can not convert the consumed value. Should have type: "
+                                                                        + type.getAClass().getSimpleName())));
     }
 
     private SensorData switchAndGet(SensorDescription description, Object value) {

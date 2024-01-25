@@ -1,7 +1,7 @@
 spring:
   rsocket:
     server:
-      port: ${RSOCKET_PORTS:7070}
+      port: ${RSOCKET_PORT:7070}
 
 mqtt:
   host: ${MQTT_HOST:localhost}
@@ -9,7 +9,7 @@ mqtt:
   username: ${MQTT_USERNAME:}
   password: ${MQTT_PASSWORD:}
   qos: ${MQTT_QOS:2}
-  reconnection-delay: ${MQTT_RECONNECTION_DELAY:-1}
+  reconnection-delay: ${MQTT_RECONNECTION_DELAY:128000}
   topic-base-path: ${MQTT_TOPIC_BASE_PATH:}
   enable-topic-unique-ids: ${MQTT_UNIQUE_TOPICS_ENABLED:false}
 
@@ -24,4 +24,3 @@ logging:
 
 description:
   default-resource: 'default_sensors.json'
-  path: ${SENSORS_DESCRIPTION_PATH:}

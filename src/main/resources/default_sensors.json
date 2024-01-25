@@ -1,9 +1,9 @@
 [
   {
-    "topic": "gpio1",
+    "topic": "gpio",
     "type": "DOUBLE",
     "possibleValues": [1.0, 0.0],
-    "switcher": "gpio1/state"
+    "switcher": "gpio/state"
   },
   {
     "topic": "temperature",
@@ -27,10 +27,9 @@
     "intervalInMillis": 10000
   },
   {
-    "topic": "luminosity",
-    "type": "DOUBLE",
-    "min": 0,
-    "max": 100000,
+    "topic": "smart_light",
+    "type": "STRING",
+    "possibleValues" : ["morning", "day", "night"],
     "intervalInMillis": 10000
   },
   {
@@ -43,11 +42,15 @@
   {
     "topic": "gyroscope",
     "type": "DOUBLE",
+    "min" : -2000,
+    "max" : 2000,
     "intervalInMillis": 10000
   },
   {
     "topic": "magnetic_field",
     "type": "DOUBLE",
+    "min" : -2000,
+    "max" : 2000,
     "intervalInMillis": 10000
   },
   {

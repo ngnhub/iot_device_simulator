@@ -35,7 +35,7 @@ class SensorDescriptionValidatorTest extends BaseTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenPossibleValuesNotPresentForStringType() {
+    void shouldThrowExceptionWhenNorPossibleValueOrMinMaxArePresent() {
         // given
         SensorDescription description = gpio()
                 .toBuilder()
@@ -47,7 +47,7 @@ class SensorDescriptionValidatorTest extends BaseTest {
 
         // then
         assertEquals(
-                "Possible values can't be empty for the string type. Topic: " + gpio().topic(),
+                "Possible values or min and max must be present for non-SV types. Topic: " + gpio().topic(),
                 exc.getMessage()
         );
     }

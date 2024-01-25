@@ -81,7 +81,7 @@ class SensorDataSwitcherImplTest {
         var fan = fan();
         topicToDescription.put(Objects.requireNonNull(fan.switcher()), fan);
         var expectedMessage = "Error occurred during the data processing " +
-                "{ Can not convert consumed value. Should have type: class java.lang.Double }";
+                "{ Can not convert the consumed value. Should have type: Double }";
         byte[] bytes = "value".getBytes();
 
         // when
