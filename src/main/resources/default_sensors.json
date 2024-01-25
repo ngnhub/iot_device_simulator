@@ -16,7 +16,7 @@
   {
     "topic": "fan",
     "type": "STRING",
-    "possibleValues": ["on", "of"],
+    "possibleValues": ["on", "off"],
     "switcher": "fan/state"
   },
   {
