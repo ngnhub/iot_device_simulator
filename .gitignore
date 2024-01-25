@@ -40,5 +40,4 @@ out/
 src/main/resources/application-local.yml
 
 ### Docker ###
-docker-compose-local.yml
-docker-flow.txt
+docker-flow/

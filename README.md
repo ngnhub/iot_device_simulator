@@ -63,8 +63,8 @@ docker run -p 7070:7070 --name device-simulator --env MQTT_USERNAME=username --e
 
 ### Without a Mosquitto broker on a host-machine
 
-In this case the eclipse [image](https://hub.docker.com/_/eclipse-mosquitto) can be utilized. The docker-compose
-example:<p>
+In this case, the Eclipse [image](https://hub.docker.com/_/eclipse-mosquitto) can be utilized. Here is an example of
+docker-compose.yml:<p>
 
 ```yaml
 version: '3.8'
@@ -88,8 +88,7 @@ services:
 This config file can be easily mount to the eclipse-mosquitto container.
 This config file contains the setting `listener 1883 0.0.0.0.` This allows Mosquitto to communicate with any IP address,
 providing the simplest way to set up a Mosquitto container and connect other containers to it. However, this is just an
-example,
-and such a configuration should not be used on a production broker.
+example, and such a configuration should not be used on a production broker.
 
 ### Environment variables
 
@@ -128,7 +127,7 @@ The docker compose example:
 
 The IoT Device Simulator allows you to configure and simulate various IoT devices. By default, it sends a predefined
 sensor [data](https://github.com/ngnhub/iot_device_simulator/blob/main/src/main/resources/default_sensors.json).
-The method for describing a custom schema is outlined below. Firstly let's examine a description schema.
+The method for describing a custom schema is outlined below. First, let's examine a description schema.
 
 ### Sensor description
 
@@ -159,7 +158,7 @@ If there are any subscriber (via MQTT or RSocket) they will receive these values
 * **type** (required) - the type of the generated value. Only 2 types are supported : **DOUBLE and STRING**.
   This information is mostly needed for the internal processes and for the set of validation rules.
 * **min/max** - specifies the high and low bounds for generating values and is only applicable to the **DOUBLE** type
-* **intervalInMillis** (required) - specifies the value generation time period.<p>
+* **intervalInMillis** - specifies the value generation time period.<p>
 
 #### Sensor generating strict values periodically (SVP)
 
@@ -185,7 +184,7 @@ sensors.
 #### Switchable value sensor (SV)
 
 ```json
-  {
+{
   "topic": "fan",
   "type": "STRING",
   "possibleValues": ["on", "of"],
@@ -194,8 +193,8 @@ sensors.
 ```
 
 This sensor will transmit a value received from the **switcher** to the specified **topic**.
-Essentially, it consumes values from the topic defined in the **switcher** field and then forwards them to the **topic**
-specified in the topic field.
+Essentially, it consumes values from the _topic_ defined in the **switcher field** and then forwards them to the _topic_
+specified in the **topic field**.
 
 A specific field here is:
 
@@ -217,13 +216,13 @@ There are some additional fields that can be used in any type:
 
 #### Sensor description validation rules:
 
-1. Fields **topic** and **type** are required for any type
+1. Fields **topic** and **type** are mandatory for all types
 2. The **type** field has only 2 possible values at the moment : **DOUBLE** and **STRING**
 3. **min/max** fields are only applicable for the **DOUBLE** type
 4. **possibleValue** items type have to be matched to the **type** field
 5. Either **possibleValues** or **min/max** values have to be defined if the **switcher** field is empty
-
-If any of the rules is violated, the application run will fail.
+6. The **intervalInMillis** field is mandatory for the RVP and SVP types. 
+7. If any of the rules is violated, the application run will fail.
 
 The rules are quite strict, and while most of them could be skipped, catching them during the application initialization
 step helps avoid application's unpredictable behavior.
@@ -249,7 +248,7 @@ docker-compose:
       - /path/to/sensors.json:/app/sensors/sensors.json
 ```
 
-The example of the sensor description json file can be
+The full example of the sensor description json file can be
 fond [here](https://github.com/ngnhub/iot_device_simulator/blob/main/src/main/resources/default_sensors.json).
 
 ## MQTT
