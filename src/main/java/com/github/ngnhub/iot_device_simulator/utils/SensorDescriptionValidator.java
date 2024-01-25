@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import static com.github.ngnhub.iot_device_simulator.utils.SensorValueType.STRING;
-
 @Component
 @RequiredArgsConstructor
 public class SensorDescriptionValidator {
@@ -21,14 +19,17 @@ public class SensorDescriptionValidator {
         if (description.switcher() != null) {
             jakartaValidator.validate(description.switcher());
         }
-        validateStringHasPossibleValues(description);
+        validateGeneratorHasPossibleValues(description);
         validatePossibleValuesMatchType(description);
         validateNotSwitcherAndHastNotInterval(description);
     }
 
-    private void validateStringHasPossibleValues(SensorDescription description) {
-        if (STRING == description.type() && CollectionUtils.isEmpty(description.possibleValues())) {
-            throwError("Possible values can't be empty for the string type. Topic: ", description.topic());
+    private void validateGeneratorHasPossibleValues(SensorDescription description) {
+        if (description.switcher() == null
+                && CollectionUtils.isEmpty(description.possibleValues())
+                && description.min() == null
+                && description.max() == null) {
+            throwError("Possible values or min and max must be present for non-SV types. Topic: ", description.topic());
         }
     }
 
