@@ -5,14 +5,14 @@ plugins {
 }
 
 group = "com.github.ngnhub"
-version = "0.0.1-SNAPSHOT"
+version = "1.0"
 
 // versions
 val mqttVersion = "1.2.5"
 val assertJVersion = "3.25.1"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
 }
 
 configurations {
