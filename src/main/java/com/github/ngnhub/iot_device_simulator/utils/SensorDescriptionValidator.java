@@ -23,7 +23,7 @@ public class SensorDescriptionValidator {
         }
         validateStringHasPossibleValues(description);
         validatePossibleValuesMatchType(description);
-        validateNotSwitcherAndHastInterval(description);
+        validateNotSwitcherAndHastNotInterval(description);
     }
 
     private void validateStringHasPossibleValues(SensorDescription description) {
@@ -44,7 +44,7 @@ public class SensorDescriptionValidator {
         });
     }
 
-    private void validateNotSwitcherAndHastInterval(SensorDescription description) {
+    private void validateNotSwitcherAndHastNotInterval(SensorDescription description) {
         if (description.switcher() == null && description.interval() == null) {
             throwError("Interval must not be null if not switchable. Topic: ", description.topic());
         }
