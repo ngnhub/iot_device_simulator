@@ -42,11 +42,15 @@
   {
     "topic": "gyroscope",
     "type": "DOUBLE",
+    "min" : -2000,
+    "max" : 2000,
     "intervalInMillis": 10000
   },
   {
     "topic": "magnetic_field",
     "type": "DOUBLE",
+    "min" : -2000,
+    "max" : 2000,
     "intervalInMillis": 10000
   },
   {

@@ -24,4 +24,3 @@ logging:
 
 description:
   default-resource: 'default_sensors.json'
-  path: ${SENSORS_DESCRIPTION_PATH:}
