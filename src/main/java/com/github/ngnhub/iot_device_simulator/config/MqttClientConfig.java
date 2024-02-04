@@ -34,7 +34,7 @@ public class MqttClientConfig {
         var options = new MqttConnectOptions();
         var username = props.getUsername();
         if (!ObjectUtils.isEmpty(username)) {
-            options.setUserName(props.getUsername());
+            options.setUserName(username);
         }
         var password = props.getPassword();
         if (!ObjectUtils.isEmpty(password)) {
