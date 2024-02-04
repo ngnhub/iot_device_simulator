@@ -1,6 +1,5 @@
 package com.github.ngnhub.iot_device_simulator.config;
 
-import lombok.RequiredArgsConstructor;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -14,7 +13,6 @@ import org.springframework.util.ObjectUtils;
 import java.util.UUID;
 
 @Configuration
-@RequiredArgsConstructor
 @ConditionalOnProperty(name = "mqtt.enabled", matchIfMissing = true)
 public class MqttClientConfig {
 
