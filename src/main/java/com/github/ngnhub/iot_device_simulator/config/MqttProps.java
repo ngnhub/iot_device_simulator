@@ -1,6 +1,5 @@
 package com.github.ngnhub.iot_device_simulator.config;
 
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
